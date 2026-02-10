@@ -7,7 +7,6 @@ import {
 import {
   initializeGameState,
   spawnPieceFromHome,
-  moveStack,
 } from '../../state';
 
 describe('Rules Module', () => {
@@ -318,7 +317,7 @@ describe('Rules Module', () => {
       const state = initializeGameState();
 
       expect(() =>
-        validateMove(state, { type: 'INVALID' as any }, 1)
+        validateMove(state, { type: 'INVALID' } as never, 1)
       ).toThrow('Invalid move target type');
     });
 

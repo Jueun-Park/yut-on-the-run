@@ -1,7 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import {
   BOARD_GRAPH,
-  BRANCH_NODES,
   getBranchOptions,
   getNextNode,
   traverseSteps,

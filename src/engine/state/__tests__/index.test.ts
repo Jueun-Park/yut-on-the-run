@@ -274,7 +274,7 @@ describe('State Module', () => {
     });
 
     it('should throw error when transitioning to PLAY from wrong phase', () => {
-      let state = initializeGameState();
+      const state = initializeGameState();
       state.phase = GamePhase.PLAY;
 
       expect(() => transitionToPlay(state)).toThrow(
