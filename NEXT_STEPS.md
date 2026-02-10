@@ -16,6 +16,7 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 - [ ] Confirm GitHub Pages deployment is working
 - [ ] Test Vite base path configuration (`/yut-on-the-run/`)
 - [ ] Verify asset loading on deployed site
+> pnpm version is pinned to 10.29.2 in `package.json` and the deployment workflow to unblock the Pages build.
 
 #### 1.2 Setup Tailwind CSS
 - [ ] Install Tailwind CSS dependencies
