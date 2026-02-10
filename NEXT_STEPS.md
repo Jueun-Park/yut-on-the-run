@@ -50,6 +50,10 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - Handle branching nodes (O5, O10, C)
   - Calculate step movement along paths
 - [x] Export board graph utilities
+- [ ] Implement special node system
+  - [ ] Add node metadata for special node types (NORMAL, STICK, REFRESH)
+  - [ ] Implement special-node placement utility (exclude branch nodes O5, O10, C)
+  - [ ] Implement REFRESH utility to re-randomize special node locations
 
 #### 2.2 Movement Rules Module (`src/engine/rules/`)
 - [x] Implement move validation
@@ -85,24 +89,27 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - PLAY → THROW (new turn)
   - Any → GAME_OVER (4 pieces finished)
 - [x] Add state validation and error handling
+- [ ] Implement stick inventory system
+  - [ ] Add 4 fixed stick slots to game state
+  - [ ] Track stick properties (Front/Back probabilities, effects)
+- [ ] Implement node event system
+  - [ ] Add pending event/choice state for STICK node offers
+  - [ ] Add STICK offer modal state (keep/replace or discard decision)
+  - [ ] Implement post-move node-event handling
+  - [ ] Add REFRESH event trigger and special node re-randomization
 
-#### 2.4 RNG with Weighted Table (`src/engine/rng/`)
-- [x] Implement probability table for yut throws
-  ```typescript
-  // 도(1): 20%, 개(2): 33%, 걸(3): 27%, 윷(4): 13%, 모(5): 7%
-  const YUT_PROBABILITY_TABLE = [
-    { result: 'DO', steps: 1, probability: 0.20 },
-    { result: 'GAE', steps: 2, probability: 0.33 },
-    { result: 'GEOL', steps: 3, probability: 0.27 },
-    { result: 'YUT', steps: 4, probability: 0.13 },
-    { result: 'MO', steps: 5, probability: 0.07 },
-  ];
-  ```
-- [x] Implement cumulative probability sampling
-  - Generate random float [0, 1)
-  - Map to cumulative probability ranges
-  - Return corresponding result
-- [x] Add throw bonus logic (윷/모 → +1 throw)
+#### 2.4 RNG with 4-Stick Sampling (`src/engine/rng/`)
+- [ ] Implement 4-stick throw model
+  - [ ] Define stick interface (Front/Back probabilities, effects)
+  - [ ] Implement simultaneous 4-stick sampling
+  - [ ] Calculate backCount (number of Back results, 0..4)
+  - [ ] Map backCount to outcome:
+    - backCount=1 → DO (1 step)
+    - backCount=2 → GAE (2 steps)
+    - backCount=3 → GEOL (3 steps)
+    - backCount=4 → YUT (4 steps)
+    - backCount=0 → MO (5 steps)
+- [x] Add throw bonus logic (YUT/MO → +1 throw)
 - [ ] (Future) Add seed-based RNG for reproducibility
 
 #### 2.5 Reward System (`src/engine/rewards/`)
@@ -114,6 +121,7 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 - [x] Define artifact interface (content TBD)
 - [x] Implement artifact selection RNG
 - [ ] Hook reward triggers to finish events
+- [ ] Confirm artifacts awarded only on FINISH (not on special nodes)
 
 ---
 
@@ -209,6 +217,10 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 - [x] Test path-finding from each node
 - [x] Test branch detection at O5, O10, C
 - [x] Test path traversal with step counts
+- [ ] Test special node placement
+  - [ ] Verify branch nodes (O5, O10, C) excluded from special nodes
+  - [ ] Test REFRESH re-randomization utility
+  - [ ] Verify special nodes can move (NORMAL ↔ STICK/REFRESH)
 
 #### 4.3 Movement Rules Tests (`src/engine/rules/__tests__/`)
 - [x] Test HOME spawn scenarios
@@ -227,19 +239,31 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - Merged stack moves together
 
 #### 4.4 RNG Tests (`src/engine/rng/__tests__/`)
-- [x] Test probability distribution (statistical)
-- [x] Test bonus throw logic (윷/모)
-- [x] Test result mapping
+- [ ] Test 4-stick sampling
+  - [ ] Test backCount calculation (0..4)
+  - [ ] Test backCount → outcome mapping (0→MO, 1→DO, 2→GAE, 3→GEOL, 4→YUT)
+  - [ ] Verify each stick samples independently
+- [x] Test bonus throw logic (YUT/MO → +1 throw)
 
 #### 4.5 State Machine Tests (`src/engine/state/__tests__/`)
 - [x] Test phase transitions
 - [x] Test game over detection
 - [x] Test turn counter increments
 - [x] Test hand token management
+- [ ] Test stick inventory management
+  - [ ] Verify 4 fixed slots
+  - [ ] Test stick replacement on STICK node
+  - [ ] Test discard option (no inventory change)
+- [ ] Test node event triggers
+  - [ ] STICK node: landing triggers offer
+  - [ ] REFRESH node: landing triggers re-randomization
+  - [ ] Verify "passing through" does NOT trigger
+  - [ ] Verify pieces already standing do NOT trigger after REFRESH
 
 #### 4.6 Rewards Module Tests (`src/engine/rewards/__tests__/`)
 - [x] Test reward choice calculation based on stack size
 - [x] Test artifact candidate generation
+- [ ] Verify artifacts only awarded on FINISH (not on special nodes)
 
 ---
 
