@@ -195,46 +195,51 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 ### Milestone 4: Testing
 
 #### 4.1 Setup Test Infrastructure
-- [ ] Install testing dependencies (vitest, @testing-library/react)
+- [x] Install testing dependencies (vitest, @testing-library/react)
   ```bash
   pnpm add -D vitest @testing-library/react @testing-library/jest-dom jsdom
   ```
-- [ ] Configure vitest in `vite.config.ts`
-- [ ] Add test scripts to `package.json`
-- [ ] Create test utilities and helpers
+- [x] Configure vitest in `vite.config.ts`
+- [x] Add test scripts to `package.json`
+- [x] Create test utilities and helpers
+- [x] Setup PR check GitHub Actions workflow
 
 #### 4.2 Board Module Tests (`src/engine/board/__tests__/`)
-- [ ] Test node connections
-- [ ] Test path-finding from each node
-- [ ] Test branch detection at O5, O10, C
-- [ ] Test path traversal with step counts
+- [x] Test node connections
+- [x] Test path-finding from each node
+- [x] Test branch detection at O5, O10, C
+- [x] Test path traversal with step counts
 
 #### 4.3 Movement Rules Tests (`src/engine/rules/__tests__/`)
-- [ ] Test HOME spawn scenarios
+- [x] Test HOME spawn scenarios
   - HOME + 도(1) → O1
   - HOME + 모(5) → O5
-- [ ] Test branch selection scenarios
+- [x] Test branch selection scenarios
   - O5 + 도(1) → O6 or A1
   - O10 + 도(1) → O11 or B1
   - C + 도(1) → A3 or B3
-- [ ] Test finish scenarios
+- [x] Test finish scenarios
   - O19 + 도(1) → O20 (not finished)
   - O20 + 도(1) → FINISHED (overshoot)
   - O19 + 개(2) → FINISHED (overshoot)
-- [ ] Test stacking scenarios
+- [x] Test stacking scenarios
   - Two stacks landing on same node → merge
   - Merged stack moves together
 
 #### 4.4 RNG Tests (`src/engine/rng/__tests__/`)
-- [ ] Test probability distribution (statistical)
-- [ ] Test bonus throw logic (윷/모)
-- [ ] Test result mapping
+- [x] Test probability distribution (statistical)
+- [x] Test bonus throw logic (윷/모)
+- [x] Test result mapping
 
 #### 4.5 State Machine Tests (`src/engine/state/__tests__/`)
-- [ ] Test phase transitions
-- [ ] Test game over detection
-- [ ] Test turn counter increments
-- [ ] Test hand token management
+- [x] Test phase transitions
+- [x] Test game over detection
+- [x] Test turn counter increments
+- [x] Test hand token management
+
+#### 4.6 Rewards Module Tests (`src/engine/rewards/__tests__/`)
+- [x] Test reward choice calculation based on stack size
+- [x] Test artifact candidate generation
 
 ---
 
