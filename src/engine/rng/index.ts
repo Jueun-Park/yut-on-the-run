@@ -31,15 +31,27 @@ export const YUT_PROBABILITY_TABLE: YutProbability[] = [
 ];
 
 /**
- * Throws yut sticks and returns the result
- * TODO: Implement cumulative probability sampling
+ * Throws yut sticks and returns the result using cumulative probability sampling
  */
 export function throwYut(): HandToken {
-  // TODO: Implement RNG logic
-  // Generate random float [0, 1)
-  // Map to cumulative probability ranges
-  // Return corresponding result
-  throw new Error('Not implemented');
+  const random = Math.random(); // [0, 1)
+  let cumulative = 0;
+
+  for (const entry of YUT_PROBABILITY_TABLE) {
+    cumulative += entry.probability;
+    if (random < cumulative) {
+      return {
+        result: entry.result,
+        steps: entry.steps,
+      };
+    }
+  }
+
+  // Fallback (should never reach here if probabilities sum to 1)
+  return {
+    result: 'DO',
+    steps: 1,
+  };
 }
 
 /**
