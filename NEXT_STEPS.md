@@ -13,20 +13,19 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 ### Milestone 1: Infrastructure Setup
 
 #### 1.1 Verify Deployment
-- [ ] Confirm GitHub Pages deployment is working
-- [ ] Test Vite base path configuration (`/yut-on-the-run/`)
-- [ ] Verify asset loading on deployed site
+- [x] Confirm GitHub Pages deployment is working
+- [x] Test Vite base path configuration (`/yut-on-the-run/`)
+- [x] Verify asset loading on deployed site
 > pnpm version is pinned to 10.29.2 in `package.json` and the deployment workflow to unblock the Pages build.
 
 #### 1.2 Setup Tailwind CSS
-- [ ] Install Tailwind CSS dependencies
+- [x] Install Tailwind CSS dependencies
   ```bash
-  pnpm add -D tailwindcss postcss autoprefixer
-  pnpm dlx tailwindcss init -p
+  pnpm add -D tailwindcss postcss autoprefixer @tailwindcss/postcss
   ```
-- [ ] Configure `tailwind.config.js` with content paths
-- [ ] Add Tailwind directives to `src/index.css`
-- [ ] Test Tailwind classes in App.tsx
+- [x] Configure `tailwind.config.js` with content paths
+- [x] Add Tailwind directives to `src/index.css`
+- [x] Test Tailwind classes in App.tsx
 
 #### 1.3 (Optional) Setup shadcn/ui
 - [ ] Initialize shadcn/ui if desired for component library
