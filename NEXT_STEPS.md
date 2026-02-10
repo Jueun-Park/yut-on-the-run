@@ -37,57 +37,57 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 ### Milestone 2: Core Game Engine
 
 #### 2.1 Board Graph Module (`src/engine/board/`)
-- [ ] Define node types and interfaces
+- [x] Define node types and interfaces
   - `BoardNode` type (O0-O20, C, A1-A4, B1-B4)
   - Node states and connections
-- [ ] Implement board graph structure
+- [x] Implement board graph structure
   - Outer path (O0-O20)
   - Center node (C)
   - Diagonal A (O5 → A1 → A2 → C → A3 → A4 → O15)
   - Diagonal B (O10 → B1 → B2 → C → B3 → B4 → O20)
-- [ ] Implement path-finding logic
+- [x] Implement path-finding logic
   - Get next nodes from current position
   - Handle branching nodes (O5, O10, C)
   - Calculate step movement along paths
-- [ ] Export board graph utilities
+- [x] Export board graph utilities
 
 #### 2.2 Movement Rules Module (`src/engine/rules/`)
-- [ ] Implement move validation
+- [x] Implement move validation
   - Check valid moves from current position
   - Handle HOME spawning (O0 → O1+)
   - Branch selection at O5, O10, C
-- [ ] Implement move simulation
+- [x] Implement move simulation
   - Calculate final position after N steps
   - Handle overshoot completion (O20+ → FINISHED)
   - Track path taken during move
-- [ ] Implement stacking rules
+- [x] Implement stacking rules
   - Auto-merge when landing on occupied node
   - No split moves for stacks
-- [ ] Implement finish detection
+- [x] Implement finish detection
   - Detect when piece reaches FINISHED state
   - Handle overshoot rule (O20 + 1 step → FINISHED)
 
 #### 2.3 Turn State Machine (`src/engine/state/`)
-- [ ] Define game state types
+- [x] Define game state types
   - `GamePhase` enum: THROW, PLAY, REWARD, GAME_OVER
   - `PieceState`: HOME, ON_BOARD, FINISHED
   - `Stack` type with piece IDs
   - `HandToken` type (도/개/걸/윷/모)
-- [ ] Implement turn state
+- [x] Implement turn state
   - Current turn number
   - Phase tracking
   - Hand tokens array
   - Throws remaining counter
-- [ ] Implement state transitions
+- [x] Implement state transitions
   - THROW → PLAY transition
   - PLAY → REWARD (on finish)
   - REWARD → PLAY (continue turn)
   - PLAY → THROW (new turn)
   - Any → GAME_OVER (4 pieces finished)
-- [ ] Add state validation and error handling
+- [x] Add state validation and error handling
 
 #### 2.4 RNG with Weighted Table (`src/engine/rng/`)
-- [ ] Implement probability table for yut throws
+- [x] Implement probability table for yut throws
   ```typescript
   // 도(1): 20%, 개(2): 33%, 걸(3): 27%, 윷(4): 13%, 모(5): 7%
   const YUT_PROBABILITY_TABLE = [
@@ -98,21 +98,21 @@ This document outlines the implementation plan for completing the MVP of yut-on-
     { result: 'MO', steps: 5, probability: 0.07 },
   ];
   ```
-- [ ] Implement cumulative probability sampling
+- [x] Implement cumulative probability sampling
   - Generate random float [0, 1)
   - Map to cumulative probability ranges
   - Return corresponding result
-- [ ] Add throw bonus logic (윷/모 → +1 throw)
+- [x] Add throw bonus logic (윷/모 → +1 throw)
 - [ ] (Future) Add seed-based RNG for reproducibility
 
 #### 2.5 Reward System (`src/engine/rewards/`)
-- [ ] Calculate reward candidates based on stack size
+- [x] Calculate reward candidates based on stack size
   - k=1 piece → 3 artifact choices
   - k=2 pieces → 2 artifact choices
   - k=3 pieces → 1 artifact choice
   - k=4 pieces → 1 artifact choice
-- [ ] Define artifact interface (content TBD)
-- [ ] Implement artifact selection RNG
+- [x] Define artifact interface (content TBD)
+- [x] Implement artifact selection RNG
 - [ ] Hook reward triggers to finish events
 
 ---
