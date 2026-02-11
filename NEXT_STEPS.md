@@ -110,7 +110,12 @@ This document outlines the implementation plan for completing the MVP of yut-on-
     - backCount=4 → YUT (4 steps)
     - backCount=0 → MO (5 steps)
 - [x] Add throw bonus logic (YUT/MO → +1 throw)
-- [ ] (Future) Add seed-based RNG for reproducibility
+- [ ] Add seed-based RNG for reproducibility
+  - [ ] Accept seed input (string, max 10 characters)
+  - [ ] Normalize seed with `trim()` function
+  - [ ] Generate random seed if trimmed seed is empty
+  - [ ] Store and display seed for sharing
+  - [ ] Ensure same seed + same choices = same game outcome
 
 #### 2.5 Reward System (`src/engine/rewards/`)
 - [x] Calculate reward candidates based on stack size
@@ -137,6 +142,19 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 - [ ] Implement header with turn counter
 - [ ] Add game phase indicator
 - [ ] Style with Tailwind
+
+#### 3.1.5 Settings UI (`src/components/Settings.tsx`)
+- [ ] Add Settings gear button (⚙️) in header
+- [ ] Implement Settings modal/panel
+  - [ ] Seed input field (max 10 characters)
+  - [ ] Input validation and character limit
+  - [ ] "Play New Game with Seed" button
+- [ ] Implement seed handling
+  - [ ] Normalize seed with `trim()` on submission
+  - [ ] Generate random seed if trimmed seed is empty
+  - [ ] Display generated seed to user
+  - [ ] Store seed in game state for sharing
+- [ ] Style with Tailwind/shadcn/ui
 
 #### 3.2 Throw Phase UI (`src/components/ThrowPhase.tsx`)
 - [ ] Display throws remaining counter
@@ -215,11 +233,33 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 #### 3.6 Game Over Screen (`src/components/GameOver.tsx`)
 - [ ] Display completion message
 - [ ] Show total turn count
+- [ ] Show game seed used
 - [ ] Show game summary
   - Final positions (all FINISHED)
   - Artifacts collected
+  - Final stick inventory (all 4 slots)
   - Key statistics
-- [ ] Add "Copy Summary" button
+- [ ] Implement Copy Short button
+  - [ ] Format: Single-line text with game name/mode, seed, and turn count
+  - [ ] Example template: `윷판 달리기 클리어! Seed: abc123, 턴: 42`
+  - [ ] Copy to clipboard using Clipboard API
+  - [ ] Show success feedback on successful copy
+- [ ] Implement Copy Long button
+  - [ ] Format: Multi-line text with seed, turns, artifacts list, and sticks list
+  - [ ] Example template:
+    ```
+    윷판 달리기 클리어!
+    Seed: abc123
+    턴: 42
+    유물: 신속의 부적, 행운의 말발굽, 중앙 지름길
+    윷가락: 기본 윷가락, 기본 윷가락, 행운 윷가락, 기본 윷가락
+    ```
+  - [ ] Copy to clipboard using Clipboard API
+  - [ ] Show success feedback on successful copy
+- [ ] Implement clipboard failure fallback
+  - [ ] Detect Clipboard API failure or unavailability
+  - [ ] Show text in selectable textarea
+  - [ ] Display manual copy instruction: "텍스트를 선택하여 수동으로 복사하세요"
 - [ ] Add "New Game" button
 
 ---
@@ -334,7 +374,6 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 
 - [ ] Special yut sticks (deck-building mechanic)
 - [ ] Diverse artifact effects
-- [ ] Seed-based RNG for reproducibility
 - [ ] Undo/redo functionality
 - [ ] Animation system
 - [ ] Sound effects
