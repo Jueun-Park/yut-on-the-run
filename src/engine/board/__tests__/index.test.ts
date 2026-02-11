@@ -5,6 +5,9 @@ import {
   getNextNode,
   traverseSteps,
   isBranchNode,
+  getEligibleNodes,
+  createInitialSpecialNodes,
+  DEFAULT_SPECIAL_NODE_CONFIG,
 } from '../index';
 
 describe('Board Graph Module', () => {
@@ -243,6 +246,156 @@ describe('Board Graph Module', () => {
       expect(isBranchNode('O1')).toBe(false);
       expect(isBranchNode('A1')).toBe(false);
       expect(isBranchNode('B1')).toBe(false);
+    });
+  });
+
+  describe('Special Node System', () => {
+    describe('getEligibleNodes', () => {
+      it('should exclude default excluded nodes (O0, O5, O10, C, O20)', () => {
+        const eligible = getEligibleNodes();
+        expect(eligible).not.toContain('O0');
+        expect(eligible).not.toContain('O5');
+        expect(eligible).not.toContain('O10');
+        expect(eligible).not.toContain('C');
+        expect(eligible).not.toContain('O20');
+      });
+
+      it('should include non-branch outer nodes', () => {
+        const eligible = getEligibleNodes();
+        expect(eligible).toContain('O1');
+        expect(eligible).toContain('O2');
+        expect(eligible).toContain('O19');
+      });
+
+      it('should include diagonal nodes', () => {
+        const eligible = getEligibleNodes();
+        expect(eligible).toContain('A1');
+        expect(eligible).toContain('A2');
+        expect(eligible).toContain('B1');
+        expect(eligible).toContain('B2');
+      });
+
+      it('should respect custom excluded nodes', () => {
+        const eligible = getEligibleNodes(['O1', 'O2', 'A1']);
+        expect(eligible).not.toContain('O1');
+        expect(eligible).not.toContain('O2');
+        expect(eligible).not.toContain('A1');
+        expect(eligible).toContain('O3');
+        expect(eligible).toContain('A2');
+      });
+    });
+
+    describe('DEFAULT_SPECIAL_NODE_CONFIG', () => {
+      it('should have correct default values', () => {
+        expect(DEFAULT_SPECIAL_NODE_CONFIG.stickCount).toBe(5);
+        expect(DEFAULT_SPECIAL_NODE_CONFIG.refreshCount).toBe(2);
+        expect(DEFAULT_SPECIAL_NODE_CONFIG.excludedNodeIds).toEqual([
+          'O0',
+          'O5',
+          'O10',
+          'C',
+          'O20',
+        ]);
+      });
+    });
+
+    describe('createInitialSpecialNodes', () => {
+      it('should initialize all nodes as NORMAL by default', () => {
+        const specialNodes = createInitialSpecialNodes();
+        
+        // Count NORMAL, STICK, and REFRESH nodes
+        const counts = { NORMAL: 0, STICK: 0, REFRESH: 0 };
+        Object.values(specialNodes).forEach(type => {
+          counts[type]++;
+        });
+
+        expect(counts.STICK).toBe(5);
+        expect(counts.REFRESH).toBe(2);
+        expect(counts.NORMAL).toBeGreaterThan(0);
+      });
+
+      it('should not place special nodes on excluded nodes', () => {
+        const specialNodes = createInitialSpecialNodes();
+        
+        expect(specialNodes['O0']).toBe('NORMAL');
+        expect(specialNodes['O5']).toBe('NORMAL');
+        expect(specialNodes['O10']).toBe('NORMAL');
+        expect(specialNodes['C']).toBe('NORMAL');
+        expect(specialNodes['O20']).toBe('NORMAL');
+      });
+
+      it('should place exactly stickCount STICK nodes', () => {
+        const specialNodes = createInitialSpecialNodes();
+        const stickNodes = Object.values(specialNodes).filter(
+          (type) => type === 'STICK'
+        );
+        expect(stickNodes).toHaveLength(5);
+      });
+
+      it('should place exactly refreshCount REFRESH nodes', () => {
+        const specialNodes = createInitialSpecialNodes();
+        const refreshNodes = Object.values(specialNodes).filter(
+          (type) => type === 'REFRESH'
+        );
+        expect(refreshNodes).toHaveLength(2);
+      });
+
+      it('should respect custom config', () => {
+        const customConfig = {
+          stickCount: 3,
+          refreshCount: 1,
+          excludedNodeIds: ['O0', 'O5', 'O10', 'C', 'O20'],
+        };
+        const specialNodes = createInitialSpecialNodes(customConfig);
+        
+        const stickNodes = Object.values(specialNodes).filter(
+          (type) => type === 'STICK'
+        );
+        const refreshNodes = Object.values(specialNodes).filter(
+          (type) => type === 'REFRESH'
+        );
+        
+        expect(stickNodes).toHaveLength(3);
+        expect(refreshNodes).toHaveLength(1);
+      });
+
+      it('should be deterministic with fixed RNG', () => {
+        let callCount = 0;
+        const mockRng = () => {
+          // Return predictable sequence
+          const values = [0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9];
+          return values[callCount++ % values.length];
+        };
+
+        const result1 = createInitialSpecialNodes(undefined, mockRng);
+        callCount = 0; // Reset
+        const result2 = createInitialSpecialNodes(undefined, mockRng);
+
+        expect(result1).toEqual(result2);
+      });
+
+      it('should throw error if not enough eligible nodes', () => {
+        const impossibleConfig = {
+          stickCount: 100,
+          refreshCount: 100,
+          excludedNodeIds: Object.keys(BOARD_GRAPH),
+        };
+
+        expect(() => createInitialSpecialNodes(impossibleConfig)).toThrow();
+      });
+
+      it('should distribute special nodes among eligible nodes', () => {
+        const specialNodes = createInitialSpecialNodes();
+        
+        // Verify that special nodes are only placed on eligible nodes
+        const eligibleNodes = getEligibleNodes();
+        
+        Object.entries(specialNodes).forEach(([nodeId, type]) => {
+          if (type !== 'NORMAL') {
+            expect(eligibleNodes).toContain(nodeId);
+          }
+        });
+      });
     });
   });
 });
