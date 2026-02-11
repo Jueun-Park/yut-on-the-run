@@ -50,10 +50,10 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - Handle branching nodes (O5, O10, C)
   - Calculate step movement along paths
 - [x] Export board graph utilities
-- [ ] Implement special node system
-  - [ ] Add node metadata for special node types (NORMAL, STICK, REFRESH)
-  - [ ] Implement special-node placement utility (exclude branch nodes O5, O10, C)
-  - [ ] Implement REFRESH utility to re-randomize special node locations
+- [x] Implement special node system
+  - [x] Add node metadata for special node types (NORMAL, STICK, REFRESH)
+  - [x] Implement special-node placement utility (exclude branch nodes O5, O10, C)
+  - [x] Implement REFRESH utility to re-randomize special node locations
 
 #### 2.2 Movement Rules Module (`src/engine/rules/`)
 - [x] Implement move validation
@@ -89,14 +89,14 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - PLAY → THROW (new turn)
   - Any → GAME_OVER (4 pieces finished)
 - [x] Add state validation and error handling
-- [ ] Implement stick inventory system
-  - [ ] Add 4 fixed stick slots to game state
-  - [ ] Track stick properties (Front/Back probabilities, effects)
-- [ ] Implement node event system
-  - [ ] Add pending event/choice state for STICK node offers
-  - [ ] Add STICK offer modal state (keep/replace or discard decision)
-  - [ ] Implement post-move node-event handling
-  - [ ] Add REFRESH event trigger and special node re-randomization
+- [x] Implement stick inventory system
+  - [x] Add 4 fixed stick slots to game state
+  - [x] Track stick properties (Front/Back probabilities, effects)
+- [x] Implement node event system
+  - [x] Add pending event/choice state for STICK node offers
+  - [x] Add STICK offer modal state (keep/replace or discard decision)
+  - [x] Implement post-move node-event handling
+  - [x] Add REFRESH event trigger and special node re-randomization
 
 #### 2.4 RNG with 4-Stick Sampling (`src/engine/rng/`)
 - [x] Implement 4-stick throw model
@@ -217,10 +217,10 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 - [x] Test path-finding from each node
 - [x] Test branch detection at O5, O10, C
 - [x] Test path traversal with step counts
-- [ ] Test special node placement
-  - [ ] Verify branch nodes (O5, O10, C) excluded from special nodes
-  - [ ] Test REFRESH re-randomization utility
-  - [ ] Verify special nodes can move (NORMAL ↔ STICK/REFRESH)
+- [x] Test special node placement
+  - [x] Verify branch nodes (O5, O10, C) excluded from special nodes
+  - [x] Test REFRESH re-randomization utility
+  - [x] Verify special nodes can move (NORMAL ↔ STICK/REFRESH)
 
 #### 4.3 Movement Rules Tests (`src/engine/rules/__tests__/`)
 - [x] Test HOME spawn scenarios
@@ -250,15 +250,15 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 - [x] Test game over detection
 - [x] Test turn counter increments
 - [x] Test hand token management
-- [ ] Test stick inventory management
-  - [ ] Verify 4 fixed slots
-  - [ ] Test stick replacement on STICK node
-  - [ ] Test discard option (no inventory change)
-- [ ] Test node event triggers
-  - [ ] STICK node: landing triggers offer
-  - [ ] REFRESH node: landing triggers re-randomization
-  - [ ] Verify "passing through" does NOT trigger
-  - [ ] Verify pieces already standing do NOT trigger after REFRESH
+- [x] Test stick inventory management
+  - [x] Verify 4 fixed slots
+  - [x] Test stick replacement on STICK node
+  - [x] Test discard option (no inventory change)
+- [x] Test node event triggers
+  - [x] STICK node: landing triggers offer
+  - [x] REFRESH node: landing triggers re-randomization
+  - [x] Verify "passing through" does NOT trigger
+  - [x] Verify pieces already standing do NOT trigger after REFRESH
 
 #### 4.6 Rewards Module Tests (`src/engine/rewards/__tests__/`)
 - [x] Test reward choice calculation based on stack size
