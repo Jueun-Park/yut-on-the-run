@@ -104,6 +104,10 @@ export function PlayPhase({ gameState, onExecuteMove }: PlayPhaseProps) {
     });
   }
 
+  // Determine if a token is currently selected
+  const isTokenSelected = selection.stage !== 'SELECT_TOKEN' && 'tokenIndex' in selection;
+  const selectedTokenIndex = isTokenSelected ? selection.tokenIndex : -1;
+
   return (
     <div className="space-y-4">
       {/* Hand tokens */}
@@ -113,7 +117,7 @@ export function PlayPhase({ gameState, onExecuteMove }: PlayPhaseProps) {
           {gameState.hand.map((token, index) => (
             <Button
               key={index}
-              variant={selection.stage !== 'SELECT_TOKEN' && 'tokenIndex' in selection && selection.tokenIndex === index ? "default" : "outline"}
+              variant={selectedTokenIndex === index ? "default" : "outline"}
               onClick={() => handleTokenSelect(index)}
               disabled={selection.stage !== 'SELECT_TOKEN'}
             >

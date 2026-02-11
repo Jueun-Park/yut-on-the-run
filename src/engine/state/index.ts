@@ -86,8 +86,15 @@ export interface GameState {
 
 /**
  * Initialize a new game state
- * @param seedOrSpecialNodes Seed for deterministic RNG OR pre-initialized special nodes (for backward compatibility)
- * @param specialNodesParam Optional pre-initialized special nodes mapping (when first param is seed)
+ * 
+ * Supports two call signatures:
+ * 1. initializeGameState(seed: string, specialNodes?: Record<NodeId, SpecialNodeType>)
+ *    - Creates game with specified seed and optional pre-initialized special nodes
+ * 2. initializeGameState(specialNodes: Record<NodeId, SpecialNodeType>)
+ *    - For backward compatibility: creates game with auto-generated seed and provided special nodes
+ * 
+ * @param seedOrSpecialNodes Seed string (new signature) OR special nodes mapping (legacy signature)
+ * @param specialNodesParam Optional special nodes when first param is a seed string
  */
 export function initializeGameState(
   seedOrSpecialNodes: string | Record<NodeId, SpecialNodeType> = '',

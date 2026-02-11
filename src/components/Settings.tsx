@@ -39,7 +39,6 @@ export function Settings({ onNewGame, currentSeed }: SettingsProps) {
   }
 
   const remainingChars = 10 - seedInput.length
-  const hasError = false // No error state, we just limit input length
 
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -93,7 +92,7 @@ export function Settings({ onNewGame, currentSeed }: SettingsProps) {
               onChange={handleSeedChange}
               maxLength={10}
             />
-            <p className={`text-xs ${hasError ? "text-destructive" : "text-muted-foreground"}`}>
+            <p className="text-xs text-muted-foreground">
               {remainingChars} character{remainingChars !== 1 ? 's' : ''} remaining
             </p>
             {currentSeed && (
