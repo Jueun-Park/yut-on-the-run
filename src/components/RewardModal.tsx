@@ -5,33 +5,30 @@
  * - Shows N artifact candidates (based on stack size)
  * - Allows selection of one artifact
  * - Closes and returns to PLAY phase after selection
- * 
- * TODO: Implement modal overlay
- * TODO: Display artifact candidates
- * TODO: Implement selection UI
- * TODO: Handle selection confirmation
  */
 
 import type { Artifact } from '../engine/rewards';
 
 interface RewardModalProps {
-  artifacts: Artifact[];
+  candidates: Artifact[];
   onSelect: (artifact: Artifact) => void;
-  isOpen: boolean;
 }
 
-export function RewardModal({ artifacts, onSelect, isOpen }: RewardModalProps) {
-  if (!isOpen) return null;
-
-  // TODO: Implement modal UI
+export function RewardModal({ candidates, onSelect }: RewardModalProps) {
+  // TODO: Implement modal UI with proper Dialog component
   // Placeholder to avoid unused variable warnings
-  console.log({ artifacts, onSelect });
+  console.log({ candidates, onSelect });
   
   return (
-    <div>
-      <h2>Reward Selection</h2>
-      {/* TODO: Display artifact candidates */}
-      {/* TODO: Add selection buttons */}
+    <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50">
+      <div className="bg-background border rounded-lg p-6 max-w-md">
+        <h2 className="text-xl font-bold mb-4">Reward Selection</h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          Choose one artifact as your reward:
+        </p>
+        {/* TODO: Display artifact candidates */}
+        {/* TODO: Add selection buttons */}
+      </div>
     </div>
   );
 }

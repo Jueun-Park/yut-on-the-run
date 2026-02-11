@@ -7,28 +7,16 @@
  * - Game summary (artifacts, statistics)
  * - Copy summary button
  * - New game button
- * 
- * TODO: Implement completion UI
- * TODO: Add summary statistics
- * TODO: Implement copy to clipboard
- * TODO: Add new game handler
  */
 
-interface GameOverProps {
-  turnCount: number;
-  // TODO: Add more props for game statistics
-  onNewGame: () => void;
-}
-
-export function GameOver({ turnCount, onNewGame }: GameOverProps) {
-  // TODO: Implement game over screen
-  // Placeholder to avoid unused variable warnings
-  console.log({ onNewGame });
+export function GameOver() {
+  // TODO: Accept props for game stats when ready
+  // TODO: Implement game over screen with full details
   
   return (
-    <div>
-      <h1>Game Complete!</h1>
-      <p>Total turns: {turnCount}</p>
+    <div className="text-center">
+      <h1 className="text-3xl font-bold mb-4">Game Complete!</h1>
+      <p className="text-muted-foreground">All pieces have finished!</p>
       {/* TODO: Display game summary */}
       {/* TODO: Add copy button */}
       {/* TODO: Add new game button */}
