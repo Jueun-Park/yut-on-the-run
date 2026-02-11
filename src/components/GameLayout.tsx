@@ -4,13 +4,106 @@ import { ThrowPhase } from "./ThrowPhase"
 import { PlayPhase } from "./PlayPhase"
 import { RewardModal } from "./RewardModal"
 import { GameOver } from "./GameOver"
-import { GamePhase, initializeGameState, type GameState } from "@/engine/state"
+import { 
+  GamePhase, 
+  initializeGameState, 
+  addHandToken, 
+  transitionToPlay,
+  removeHandToken,
+  transitionToReward,
+  completeReward,
+  advanceTurn,
+  isGameOver,
+  type GameState,
+  type Artifact 
+} from "@/engine/state"
+import { throwYut, grantsBonus } from "@/engine/rng"
+import { executeMove, type MoveTarget } from "@/engine/rules"
+import { calculateRewardChoices, generateArtifactCandidates } from "@/engine/rewards"
+import type { BranchOption } from "@/engine/board"
 
 export function GameLayout() {
   const [gameState, setGameState] = useState<GameState>(() => initializeGameState())
 
   const handleNewGame = (seed: string) => {
     setGameState(initializeGameState(seed))
+  }
+
+  const handleThrow = () => {
+    if (gameState.throwsRemaining <= 0) return;
+
+    // Throw using the game's RNG
+    const result = throwYut(gameState.stickInventory, () => gameState.rng.next())
+    
+    // Add token to hand
+    let newState = addHandToken(gameState, result)
+    
+    // Handle bonus throws (YUT/MO grant +1 throw)
+    if (grantsBonus(result.result)) {
+      newState = {
+        ...newState,
+        throwsRemaining: newState.throwsRemaining, // Keep same, bonus throw
+      }
+    } else {
+      // Decrement throws remaining
+      newState = {
+        ...newState,
+        throwsRemaining: newState.throwsRemaining - 1,
+      }
+    }
+    
+    setGameState(newState)
+  }
+
+  const handleStartMove = () => {
+    setGameState(transitionToPlay(gameState))
+  }
+
+  const handleExecuteMove = (tokenIndex: number, target: MoveTarget, branchChoice?: BranchOption) => {
+    const token = gameState.hand[tokenIndex]
+    if (!token) return
+
+    // Execute the move
+    let newState = executeMove(gameState, target, token.steps, branchChoice)
+    
+    // Remove the token from hand
+    newState = removeHandToken(newState, tokenIndex)
+
+    // Check if a piece finished (for reward)
+    // Compare piece states before and after to detect finish
+    const finishedPiecesAfter = newState.pieces.filter(p => p.state === 'FINISHED').length
+    const finishedPiecesBefore = gameState.pieces.filter(p => p.state === 'FINISHED').length
+    
+    if (finishedPiecesAfter > finishedPiecesBefore) {
+      // A piece finished! Trigger reward
+      // Determine stack size that finished (for reward calculation)
+      let stackSize = 1
+      if (target.type === 'STACK') {
+        const stack = gameState.stacks.find(s => s.id === target.stackId)
+        if (stack) {
+          stackSize = stack.pieceIds.length
+        }
+      }
+      
+      const rewardCount = calculateRewardChoices(stackSize)
+      const candidates = generateArtifactCandidates(rewardCount, () => newState.rng.next())
+      
+      newState = transitionToReward(newState, stackSize, candidates)
+    } else if (newState.hand.length === 0) {
+      // No more tokens, advance turn
+      if (!isGameOver(newState)) {
+        newState = advanceTurn(newState)
+      } else {
+        newState = { ...newState, phase: GamePhase.GAME_OVER }
+      }
+    }
+    
+    setGameState(newState)
+  }
+
+  const handleRewardSelect = (artifact: Artifact) => {
+    let newState = completeReward(gameState, artifact)
+    setGameState(newState)
   }
 
   const phaseText = {
@@ -43,12 +136,12 @@ export function GameLayout() {
           <GameOver />
         ) : (
           <>
-            {/* Board area - square placeholder */}
-            <div className="w-full max-w-md aspect-square border-2 border-dashed border-muted-foreground/25 rounded-lg flex items-center justify-center mb-4">
-              <p className="text-muted-foreground text-center px-4">
-                Game board placeholder
-              </p>
-            </div>
+            {/* Board area - will show in play phase */}
+            {gameState.phase !== GamePhase.THROW && (
+              <div className="w-full max-w-md mb-4">
+                {/* Board is rendered in PlayPhase */}
+              </div>
+            )}
           </>
         )}
       </main>
@@ -61,14 +154,14 @@ export function GameLayout() {
               <ThrowPhase
                 throwsRemaining={gameState.throwsRemaining}
                 hand={gameState.hand}
-                onThrow={() => {}}
-                onStartMove={() => {}}
+                onThrow={handleThrow}
+                onStartMove={handleStartMove}
               />
             )}
             {gameState.phase === GamePhase.PLAY && (
               <PlayPhase
-                hand={gameState.hand}
-                onSelectToken={() => {}}
+                gameState={gameState}
+                onExecuteMove={handleExecuteMove}
               />
             )}
           </div>
@@ -79,7 +172,7 @@ export function GameLayout() {
       {gameState.phase === GamePhase.REWARD && gameState.pendingReward && (
         <RewardModal
           candidates={gameState.pendingReward.candidates}
-          onSelect={() => {}}
+          onSelect={handleRewardSelect}
         />
       )}
     </div>
