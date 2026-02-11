@@ -6,7 +6,7 @@ export function GameLayout() {
       {/* Header */}
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto w-full max-w-md flex h-14 items-center justify-between px-4">
-          <h1 className="text-lg font-semibold">윷판 달리기</h1>
+          <h1 className="text-lg font-semibold">yut-on-the-run</h1>
           <Settings />
         </div>
       </header>
