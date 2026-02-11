@@ -241,23 +241,23 @@ describe('Node Event Handling Module', () => {
 
   describe('shouldTriggerNodeEvent', () => {
     it('should return true when landing on a node', () => {
-      expect(shouldTriggerNodeEvent('O1', true)).toBe(true);
-      expect(shouldTriggerNodeEvent('O5', true)).toBe(true);
-      expect(shouldTriggerNodeEvent('C', true)).toBe(true);
+      expect(shouldTriggerNodeEvent(true)).toBe(true);
+      expect(shouldTriggerNodeEvent(true)).toBe(true);
+      expect(shouldTriggerNodeEvent(true)).toBe(true);
     });
 
     it('should return false when passing through a node', () => {
-      expect(shouldTriggerNodeEvent('O1', false)).toBe(false);
-      expect(shouldTriggerNodeEvent('O5', false)).toBe(false);
-      expect(shouldTriggerNodeEvent('C', false)).toBe(false);
+      expect(shouldTriggerNodeEvent(false)).toBe(false);
+      expect(shouldTriggerNodeEvent(false)).toBe(false);
+      expect(shouldTriggerNodeEvent(false)).toBe(false);
     });
 
     it('should only depend on isLanding flag, not node type', () => {
       // Node type doesn't matter for this check - only landing vs passing
-      expect(shouldTriggerNodeEvent('O0', true)).toBe(true);
-      expect(shouldTriggerNodeEvent('O0', false)).toBe(false);
-      expect(shouldTriggerNodeEvent('O20', true)).toBe(true);
-      expect(shouldTriggerNodeEvent('O20', false)).toBe(false);
+      expect(shouldTriggerNodeEvent(true)).toBe(true);
+      expect(shouldTriggerNodeEvent(false)).toBe(false);
+      expect(shouldTriggerNodeEvent(true)).toBe(true);
+      expect(shouldTriggerNodeEvent(false)).toBe(false);
     });
   });
 
@@ -267,7 +267,7 @@ describe('Node Event Handling Module', () => {
       let state = initializeGameState(specialNodes);
 
       // Landing on STICK node should trigger event
-      if (shouldTriggerNodeEvent('O1', true)) {
+      if (shouldTriggerNodeEvent(true)) {
         state = handleNodeEvent(state, 'O1', () => 0);
       }
 
@@ -288,7 +288,7 @@ describe('Node Event Handling Module', () => {
         const beforeNodes = { ...state.specialNodes };
 
         // Landing on REFRESH node should trigger event
-        if (shouldTriggerNodeEvent(refreshNode, true)) {
+        if (shouldTriggerNodeEvent(true)) {
           state = handleNodeEvent(state, refreshNode, () => 0.9);
         }
 
@@ -310,7 +310,7 @@ describe('Node Event Handling Module', () => {
       let state = initializeGameState(specialNodes);
 
       // Passing through should not trigger
-      if (shouldTriggerNodeEvent('O1', false)) {
+      if (shouldTriggerNodeEvent(false)) {
         state = handleNodeEvent(state, 'O1');
       }
 

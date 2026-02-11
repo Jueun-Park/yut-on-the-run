@@ -111,14 +111,15 @@ export function handleNodeEvent(
  * - Passing through a node during multi-step movement
  * - A piece was already on the node before REFRESH changed it
  * 
- * @param _finalNodeId The node where the piece landed (final destination) - not used in current implementation
+ * Note: In the current implementation, the specific node ID doesn't affect
+ * whether an event triggers - only the isLanding flag matters. The nodeId
+ * parameter is included for future extensibility in case node-specific
+ * logic is needed.
+ * 
  * @param isLanding True if this is the final landing node, false if passing through
  * @returns True if event should trigger
  */
-export function shouldTriggerNodeEvent(
-  _finalNodeId: NodeId,
-  isLanding: boolean
-): boolean {
+export function shouldTriggerNodeEvent(isLanding: boolean): boolean {
   // Events only trigger on landing, not pass-through
   return isLanding;
 }
