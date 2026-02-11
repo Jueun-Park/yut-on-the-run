@@ -14,6 +14,7 @@
 import type { NodeId, SpecialNodeType } from '../board';
 import type { Stick } from '../content/sticks';
 import { BASIC_STICK } from '../content/sticks';
+import { SeededRandom } from '../rng/seeded';
 
 export const GamePhase = {
   THROW: 'THROW',
@@ -78,15 +79,34 @@ export interface GameState {
   pendingStickOffer: {
     offeredStick: Stick;
   } | null;
+  // RNG and seed for deterministic gameplay
+  seed: string;
+  rng: SeededRandom;
 }
 
 /**
  * Initialize a new game state
- * @param specialNodes Optional pre-initialized special nodes mapping
+ * @param seedOrSpecialNodes Seed for deterministic RNG OR pre-initialized special nodes (for backward compatibility)
+ * @param specialNodesParam Optional pre-initialized special nodes mapping (when first param is seed)
  */
 export function initializeGameState(
-  specialNodes?: Record<NodeId, SpecialNodeType>
+  seedOrSpecialNodes: string | Record<NodeId, SpecialNodeType> = '',
+  specialNodesParam?: Record<NodeId, SpecialNodeType>
 ): GameState {
+  let seed: string;
+  let specialNodes: Record<NodeId, SpecialNodeType> | undefined;
+  
+  // Handle both old and new signatures
+  if (typeof seedOrSpecialNodes === 'string') {
+    seed = seedOrSpecialNodes;
+    specialNodes = specialNodesParam;
+  } else {
+    // Old signature: first param is specialNodes
+    seed = '';
+    specialNodes = seedOrSpecialNodes;
+  }
+  
+  const rng = new SeededRandom(seed);
   return {
     phase: GamePhase.THROW,
     turn: 1,
@@ -104,6 +124,8 @@ export function initializeGameState(
     specialNodes: specialNodes ?? {},
     pendingReward: null,
     pendingStickOffer: null,
+    seed: rng.getSeed(),
+    rng,
   };
 }
 

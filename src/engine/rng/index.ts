@@ -94,4 +94,5 @@ export function grantsBonus(result: YutResult): boolean {
   return result === 'YUT' || result === 'MO';
 }
 
-// TODO: Export additional RNG utilities as needed
+// Export seeded RNG
+export { SeededRandom, normalizeSeed } from './seeded';

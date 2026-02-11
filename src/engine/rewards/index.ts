@@ -85,14 +85,24 @@ const ARTIFACT_POOL: Artifact[] = [
 /**
  * Generate random artifact candidates
  * For MVP, we just pick random artifacts from the pool
+ * @param count Number of artifacts to generate
+ * @param rng Random number generator function (defaults to Math.random)
  */
-export function generateArtifactCandidates(count: number): Artifact[] {
+export function generateArtifactCandidates(
+  count: number,
+  rng: () => number = Math.random
+): Artifact[] {
   if (count <= 0) return [];
   if (count > ARTIFACT_POOL.length) {
     count = ARTIFACT_POOL.length;
   }
 
-  // Shuffle and pick first N
-  const shuffled = [...ARTIFACT_POOL].sort(() => Math.random() - 0.5);
+  // Shuffle using Fisher-Yates with provided RNG
+  const shuffled = [...ARTIFACT_POOL];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  
   return shuffled.slice(0, count);
 }
