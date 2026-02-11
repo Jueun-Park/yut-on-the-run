@@ -1,26 +1,127 @@
 import { describe, it, expect } from 'vitest';
-import { throwYut, grantsBonus, YUT_PROBABILITY_TABLE } from '../index';
+import {
+  throwYut,
+  grantsBonus,
+  DEFAULT_STICK,
+  sampleStick,
+  sample4Sticks,
+  mapBackCountToResult,
+  type Stick,
+} from '../index';
 
-describe('RNG Module', () => {
-  describe('YUT_PROBABILITY_TABLE', () => {
-    it('should have correct probability distribution', () => {
-      expect(YUT_PROBABILITY_TABLE).toHaveLength(5);
+describe('RNG Module - 4-Stick Sampling', () => {
+  describe('DEFAULT_STICK', () => {
+    it('should have 50% back probability', () => {
+      expect(DEFAULT_STICK.backProbability).toBe(0.5);
+    });
+  });
 
-      const totalProbability = YUT_PROBABILITY_TABLE.reduce(
-        (sum, entry) => sum + entry.probability,
-        0
-      );
-      expect(totalProbability).toBeCloseTo(1.0, 5);
+  describe('sampleStick', () => {
+    it('should return Back when rng returns below backProbability', () => {
+      const stick: Stick = { id: 'test', name: 'Test', backProbability: 0.7 };
+      const result = sampleStick(stick, () => 0.5); // 0.5 < 0.7
+      expect(result).toBe('Back');
     });
 
-    it('should have correct result mappings', () => {
-      const table = YUT_PROBABILITY_TABLE;
+    it('should return Front when rng returns at or above backProbability', () => {
+      const stick: Stick = { id: 'test', name: 'Test', backProbability: 0.3 };
+      const result = sampleStick(stick, () => 0.5); // 0.5 >= 0.3
+      expect(result).toBe('Front');
+    });
 
-      expect(table[0]).toEqual({ result: 'DO', steps: 1, probability: 0.20 });
-      expect(table[1]).toEqual({ result: 'GAE', steps: 2, probability: 0.33 });
-      expect(table[2]).toEqual({ result: 'GEOL', steps: 3, probability: 0.27 });
-      expect(table[3]).toEqual({ result: 'YUT', steps: 4, probability: 0.13 });
-      expect(table[4]).toEqual({ result: 'MO', steps: 5, probability: 0.07 });
+    it('should return Front for backProbability 0', () => {
+      const stick: Stick = { id: 'test', name: 'Test', backProbability: 0 };
+      const result = sampleStick(stick, () => 0.5);
+      expect(result).toBe('Front');
+    });
+
+    it('should return Back for backProbability 1', () => {
+      const stick: Stick = { id: 'test', name: 'Test', backProbability: 1 };
+      const result = sampleStick(stick, () => 0.5);
+      expect(result).toBe('Back');
+    });
+  });
+
+  describe('sample4Sticks', () => {
+    it('should throw error if not exactly 4 sticks', () => {
+      expect(() => sample4Sticks([])).toThrow('Must provide exactly 4 sticks');
+      expect(() => sample4Sticks([DEFAULT_STICK])).toThrow(
+        'Must provide exactly 4 sticks'
+      );
+      expect(() =>
+        sample4Sticks([DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK])
+      ).toThrow('Must provide exactly 4 sticks');
+    });
+
+    it('should return 0 when all sticks land Front', () => {
+      const sticks = [DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK];
+      // rng always returns 1.0, which is >= backProbability (0.5), so all Front
+      const backCount = sample4Sticks(sticks, () => 1.0);
+      expect(backCount).toBe(0);
+    });
+
+    it('should return 4 when all sticks land Back', () => {
+      const sticks = [DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK];
+      // rng always returns 0.0, which is < backProbability (0.5), so all Back
+      const backCount = sample4Sticks(sticks, () => 0.0);
+      expect(backCount).toBe(4);
+    });
+
+    it('should count back results correctly with mixed results', () => {
+      const sticks = [DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK];
+      // Return sequence: [0.0, 0.6, 0.3, 0.7]
+      // With backProbability=0.5: [Back, Front, Back, Front] = 2 backs
+      let callCount = 0;
+      const sequence = [0.0, 0.6, 0.3, 0.7];
+      const mockRng = () => sequence[callCount++];
+
+      const backCount = sample4Sticks(sticks, mockRng);
+      expect(backCount).toBe(2);
+      expect(callCount).toBe(4); // Verify 4 independent samples
+    });
+
+    it('should sample each stick independently', () => {
+      const sticks = [DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK];
+      // Create controlled sequence to verify independence
+      let callCount = 0;
+      const sequence = [0.2, 0.8, 0.1, 0.9]; // Back, Front, Back, Front
+      const mockRng = () => sequence[callCount++];
+
+      const backCount = sample4Sticks(sticks, mockRng);
+      expect(backCount).toBe(2);
+      expect(callCount).toBe(4); // Must call rng exactly 4 times
+    });
+  });
+
+  describe('mapBackCountToResult', () => {
+    it('should map backCount=0 to MO (5 steps)', () => {
+      const result = mapBackCountToResult(0);
+      expect(result).toEqual({ result: 'MO', steps: 5 });
+    });
+
+    it('should map backCount=1 to DO (1 step)', () => {
+      const result = mapBackCountToResult(1);
+      expect(result).toEqual({ result: 'DO', steps: 1 });
+    });
+
+    it('should map backCount=2 to GAE (2 steps)', () => {
+      const result = mapBackCountToResult(2);
+      expect(result).toEqual({ result: 'GAE', steps: 2 });
+    });
+
+    it('should map backCount=3 to GEOL (3 steps)', () => {
+      const result = mapBackCountToResult(3);
+      expect(result).toEqual({ result: 'GEOL', steps: 3 });
+    });
+
+    it('should map backCount=4 to YUT (4 steps)', () => {
+      const result = mapBackCountToResult(4);
+      expect(result).toEqual({ result: 'YUT', steps: 4 });
+    });
+
+    it('should throw error for invalid backCount', () => {
+      expect(() => mapBackCountToResult(-1)).toThrow('Invalid backCount');
+      expect(() => mapBackCountToResult(5)).toThrow('Invalid backCount');
     });
   });
 
@@ -67,14 +168,56 @@ describe('RNG Module', () => {
       expect(results.size).toBeGreaterThan(1);
     });
 
-    it('should produce results following approximate probability distribution', () => {
+    it('should use default 4 sticks when not provided', () => {
+      // Test that throwYut() works without explicit sticks argument
+      const result = throwYut();
+      expect(['DO', 'GAE', 'GEOL', 'YUT', 'MO']).toContain(result.result);
+    });
+
+    it('should be deterministic with controlled RNG', () => {
+      const sticks = [DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK];
+      
+      // All backs (backCount=4) → YUT
+      const result1 = throwYut(sticks, () => 0.0);
+      expect(result1).toEqual({ result: 'YUT', steps: 4 });
+
+      // All fronts (backCount=0) → MO
+      const result2 = throwYut(sticks, () => 1.0);
+      expect(result2).toEqual({ result: 'MO', steps: 5 });
+
+      // 1 back (first stick back, rest front) → DO
+      let count = 0;
+      const result3 = throwYut(sticks, () => (count++ === 0 ? 0.0 : 1.0));
+      expect(result3).toEqual({ result: 'DO', steps: 1 });
+    });
+
+    it('should sample 4 independent sticks per throw', () => {
+      const sticks = [DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK];
+      let callCount = 0;
+      const mockRng = () => {
+        callCount++;
+        return Math.random();
+      };
+
+      throwYut(sticks, mockRng);
+      expect(callCount).toBe(4); // Must call rng exactly 4 times per throw
+    });
+
+    it('should produce binomial distribution with default sticks', () => {
+      // With 4 sticks at 50% back probability, outcomes follow binomial distribution
+      // Expected probabilities: P(k backs) = C(4,k) * 0.5^4
+      // backCount=0: 1/16 = 6.25%
+      // backCount=1: 4/16 = 25%
+      // backCount=2: 6/16 = 37.5%
+      // backCount=3: 4/16 = 25%
+      // backCount=4: 1/16 = 6.25%
       const samples = 10000;
       const counts = {
-        DO: 0,
-        GAE: 0,
-        GEOL: 0,
-        YUT: 0,
-        MO: 0,
+        MO: 0,   // backCount=0
+        DO: 0,   // backCount=1
+        GAE: 0,  // backCount=2
+        GEOL: 0, // backCount=3
+        YUT: 0,  // backCount=4
       };
 
       for (let i = 0; i < samples; i++) {
@@ -82,26 +225,21 @@ describe('RNG Module', () => {
         counts[result.result]++;
       }
 
-      // Check if frequencies are roughly within expected ranges (with tolerance)
-      // DO: 20% ± 3%
-      expect(counts.DO / samples).toBeGreaterThan(0.17);
-      expect(counts.DO / samples).toBeLessThan(0.23);
+      // Check approximate binomial distribution (with generous tolerance)
+      expect(counts.MO / samples).toBeGreaterThan(0.04);   // ~6.25%
+      expect(counts.MO / samples).toBeLessThan(0.09);
 
-      // GAE: 33% ± 3%
-      expect(counts.GAE / samples).toBeGreaterThan(0.30);
-      expect(counts.GAE / samples).toBeLessThan(0.36);
+      expect(counts.DO / samples).toBeGreaterThan(0.22);   // ~25%
+      expect(counts.DO / samples).toBeLessThan(0.28);
 
-      // GEOL: 27% ± 3%
-      expect(counts.GEOL / samples).toBeGreaterThan(0.24);
-      expect(counts.GEOL / samples).toBeLessThan(0.30);
+      expect(counts.GAE / samples).toBeGreaterThan(0.34);  // ~37.5%
+      expect(counts.GAE / samples).toBeLessThan(0.41);
 
-      // YUT: 13% ± 3%
-      expect(counts.YUT / samples).toBeGreaterThan(0.10);
-      expect(counts.YUT / samples).toBeLessThan(0.16);
+      expect(counts.GEOL / samples).toBeGreaterThan(0.22); // ~25%
+      expect(counts.GEOL / samples).toBeLessThan(0.28);
 
-      // MO: 7% ± 3%
-      expect(counts.MO / samples).toBeGreaterThan(0.04);
-      expect(counts.MO / samples).toBeLessThan(0.10);
+      expect(counts.YUT / samples).toBeGreaterThan(0.04);  // ~6.25%
+      expect(counts.YUT / samples).toBeLessThan(0.09);
     });
   });
 
