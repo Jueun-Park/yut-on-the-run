@@ -170,6 +170,27 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - Enable when throwsRemaining === 0
   - Transition to PLAY phase
 
+#### 3.2.5 Throw Button "손맛" (Haptics UX)
+- [ ] Add haptics utility wrapper (no toggle)
+  - [ ] Use Web Vibration API (`navigator.vibrate`) when supported
+  - [ ] Silently no-op when API unavailable
+  - [ ] No user-facing vibration toggle setting
+- [ ] Implement Throw button rolling state machine with pointer events
+  - [ ] On pointer down: enter rolling state
+  - [ ] Minimum rolling duration: 0.5s
+    - [ ] If released before 0.5s, keep rolling and commit at 0.5s
+  - [ ] Maximum rolling duration: 3.0s
+    - [ ] Auto-commit at 3.0s even without release
+  - [ ] If released after 0.5s but before 3.0s, commit immediately on release
+  - [ ] Handle pointer up/cancel/leave events to trigger commit respecting min/max timers
+- [ ] Implement haptics timing
+  - [ ] Tick vibration every 500ms during rolling (suggested 5–10ms)
+  - [ ] Confirmation vibration once on commit (suggested 30–50ms)
+  - [ ] If tick and commit coincide, commit vibration takes priority; stop tick timer on commit
+- [ ] Ensure RNG consumed exactly once per committed throw
+  - [ ] Rolling visuals must NOT consume RNG
+  - [ ] RNG consumption occurs only at commit time
+
 #### 3.3 Board Visualization (`src/components/Board.tsx`)
 - [ ] Create SVG board with traditional Yut board layout
   - Fixed coordinate layout
