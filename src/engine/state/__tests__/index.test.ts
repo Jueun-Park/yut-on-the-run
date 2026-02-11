@@ -510,7 +510,7 @@ describe('State Module', () => {
 
       it('should replace existing special nodes mapping', () => {
         const initialSpecialNodes = createInitialSpecialNodes();
-        let state = initializeGameState(initialSpecialNodes);
+        const state = initializeGameState(initialSpecialNodes);
         
         // Create a different special nodes mapping
         const newSpecialNodes = createInitialSpecialNodes(undefined, () => 0.5);

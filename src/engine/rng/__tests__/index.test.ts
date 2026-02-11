@@ -17,25 +17,25 @@ describe('RNG Module - 4-Stick Sampling', () => {
 
   describe('sampleStick', () => {
     it('should return Back when rng returns below backProbability', () => {
-      const stick: Stick = { id: 'test', name: 'Test', backProbability: 0.7 };
+      const stick: Stick = { id: 'test', name: 'Test', description: 'Test stick', backProbability: 0.7 };
       const result = sampleStick(stick, () => 0.5); // 0.5 < 0.7
       expect(result).toBe('Back');
     });
 
     it('should return Front when rng returns at or above backProbability', () => {
-      const stick: Stick = { id: 'test', name: 'Test', backProbability: 0.3 };
+      const stick: Stick = { id: 'test', name: 'Test', description: 'Test stick', backProbability: 0.3 };
       const result = sampleStick(stick, () => 0.5); // 0.5 >= 0.3
       expect(result).toBe('Front');
     });
 
     it('should return Front for backProbability 0', () => {
-      const stick: Stick = { id: 'test', name: 'Test', backProbability: 0 };
+      const stick: Stick = { id: 'test', name: 'Test', description: 'Test stick', backProbability: 0 };
       const result = sampleStick(stick, () => 0.5);
       expect(result).toBe('Front');
     });
 
     it('should return Back for backProbability 1', () => {
-      const stick: Stick = { id: 'test', name: 'Test', backProbability: 1 };
+      const stick: Stick = { id: 'test', name: 'Test', description: 'Test stick', backProbability: 1 };
       const result = sampleStick(stick, () => 0.5);
       expect(result).toBe('Back');
     });
