@@ -15,6 +15,8 @@
  */
 
 import type { YutResult, HandToken } from '../state';
+import type { Stick } from '../content/sticks';
+import { BASIC_STICK } from '../content/sticks';
 
 /**
  * Stick face result
@@ -22,28 +24,10 @@ import type { YutResult, HandToken } from '../state';
 export type StickFace = 'Front' | 'Back';
 
 /**
- * Stick configuration with Front/Back probabilities
- */
-export interface Stick {
-  id: string;
-  name: string;
-  backProbability: number; // Probability of landing Back (0.0 to 1.0)
-}
-
-/**
  * RNG function type for dependency injection (testability)
  * Returns a random number in [0, 1)
  */
 export type RngFunction = () => number;
-
-/**
- * Default stick configuration (MVP: all sticks identical with 50% back probability)
- */
-export const DEFAULT_STICK: Stick = {
-  id: 'basic',
-  name: 'Basic Stick',
-  backProbability: 0.5,
-};
 
 /**
  * Sample a single stick's throw (Front or Back)
@@ -96,7 +80,7 @@ export function mapBackCountToResult(backCount: number): HandToken {
  * @param rng Random number generator function (defaults to Math.random)
  */
 export function throwYut(
-  sticks: Stick[] = [DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK],
+  sticks: Stick[] = [BASIC_STICK, BASIC_STICK, BASIC_STICK, BASIC_STICK],
   rng: RngFunction = Math.random
 ): HandToken {
   const backCount = sample4Sticks(sticks, rng);
