@@ -28,9 +28,11 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 - [x] Test Tailwind classes in App.tsx
 
 #### 1.3 (Optional) Setup shadcn/ui
-- [ ] Initialize shadcn/ui if desired for component library
-- [ ] Configure path aliases in tsconfig and vite.config
-- [ ] Add initial components (Button, Card, Modal)
+- [x] Initialize shadcn/ui if desired for component library
+- [x] Configure path aliases in tsconfig and vite.config
+- [x] Add initial components (Button, Dialog, Switch, Label)
+- [x] Implement Settings UI with theme toggle (Light/Dark/System)
+- [x] Configure stone-themed design system with dark mode support
 
 ---
 
@@ -144,8 +146,10 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 - [ ] Style with Tailwind
 
 #### 3.1.5 Settings UI (`src/components/Settings.tsx`)
-- [ ] Add Settings gear button (⚙️) in header
-- [ ] Implement Settings modal/panel
+- [x] Add Settings gear button (⚙️) in header
+- [x] Implement Settings modal/panel
+  - [x] Theme selection (Light/Dark/System)
+  - [x] Theme persistence with localStorage
   - [ ] Seed input field (max 10 characters)
   - [ ] Input validation and character limit
   - [ ] "Play New Game with Seed" button
@@ -154,7 +158,7 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - [ ] Generate random seed if trimmed seed is empty
   - [ ] Display generated seed to user
   - [ ] Store seed in game state for sharing
-- [ ] Style with Tailwind/shadcn/ui
+- [x] Style with Tailwind/shadcn/ui
 
 #### 3.2 Throw Phase UI (`src/components/ThrowPhase.tsx`)
 - [ ] Display throws remaining counter
