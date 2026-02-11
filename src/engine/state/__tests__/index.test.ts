@@ -17,7 +17,13 @@ import {
   transitionToReward,
   completeReward,
   advanceTurn,
+  offerStick,
+  replaceStickInInventory,
+  discardStickOffer,
+  updateSpecialNodes,
 } from '../index';
+import { BASIC_STICK, STICK_POOL } from '../../content/sticks';
+import { createInitialSpecialNodes } from '../../board';
 
 describe('State Module', () => {
   describe('initializeGameState', () => {
@@ -31,7 +37,10 @@ describe('State Module', () => {
       expect(state.pieces).toHaveLength(4);
       expect(state.stacks).toEqual([]);
       expect(state.artifacts).toEqual([]);
+      expect(state.stickInventory).toHaveLength(4);
+      expect(state.specialNodes).toEqual({});
       expect(state.pendingReward).toBeNull();
+      expect(state.pendingStickOffer).toBeNull();
     });
 
     it('should initialize all pieces at HOME', () => {
@@ -42,6 +51,34 @@ describe('State Module', () => {
         expect(piece.state).toBe(PieceState.HOME);
         expect(piece.position).toBeNull();
       });
+    });
+
+    it('should initialize stick inventory with 4 BASIC_STICKs', () => {
+      const state = initializeGameState();
+
+      expect(state.stickInventory).toHaveLength(4);
+      state.stickInventory.forEach((stick) => {
+        expect(stick).toEqual(BASIC_STICK);
+      });
+    });
+
+    it('should initialize with empty special nodes by default', () => {
+      const state = initializeGameState();
+
+      expect(state.specialNodes).toEqual({});
+    });
+
+    it('should accept pre-initialized special nodes', () => {
+      const specialNodes = createInitialSpecialNodes();
+      const state = initializeGameState(specialNodes);
+
+      expect(state.specialNodes).toEqual(specialNodes);
+    });
+
+    it('should initialize with no pending stick offer', () => {
+      const state = initializeGameState();
+
+      expect(state.pendingStickOffer).toBeNull();
     });
   });
 
@@ -359,6 +396,130 @@ describe('State Module', () => {
       state = addHandToken(state, { result: 'DO', steps: 1 });
 
       expect(() => advanceTurn(state)).toThrow('Cannot advance turn: hand is not empty');
+    });
+  });
+
+  describe('Stick Inventory Management', () => {
+    describe('offerStick', () => {
+      it('should create a pending stick offer', () => {
+        const state = initializeGameState();
+        const offeredStick = STICK_POOL[0];
+
+        const newState = offerStick(state, offeredStick);
+
+        expect(newState.pendingStickOffer).not.toBeNull();
+        expect(newState.pendingStickOffer?.offeredStick).toEqual(offeredStick);
+      });
+
+      it('should throw error if pending offer already exists', () => {
+        let state = initializeGameState();
+        state = offerStick(state, STICK_POOL[0]);
+
+        expect(() => offerStick(state, STICK_POOL[1])).toThrow(
+          'Cannot offer stick: pending offer already exists'
+        );
+      });
+    });
+
+    describe('replaceStickInInventory', () => {
+      it('should replace stick at specified slot', () => {
+        let state = initializeGameState();
+        const offeredStick = STICK_POOL[0];
+        state = offerStick(state, offeredStick);
+
+        const newState = replaceStickInInventory(state, 0);
+
+        expect(newState.stickInventory[0]).toEqual(offeredStick);
+        expect(newState.stickInventory[1]).toEqual(BASIC_STICK);
+        expect(newState.stickInventory[2]).toEqual(BASIC_STICK);
+        expect(newState.stickInventory[3]).toEqual(BASIC_STICK);
+        expect(newState.pendingStickOffer).toBeNull();
+      });
+
+      it('should replace stick at each slot independently', () => {
+        for (let slot = 0; slot < 4; slot++) {
+          let state = initializeGameState();
+          const offeredStick = STICK_POOL[slot];
+          state = offerStick(state, offeredStick);
+
+          const newState = replaceStickInInventory(state, slot);
+
+          expect(newState.stickInventory[slot]).toEqual(offeredStick);
+          // Other slots should still have BASIC_STICK
+          for (let i = 0; i < 4; i++) {
+            if (i !== slot) {
+              expect(newState.stickInventory[i]).toEqual(BASIC_STICK);
+            }
+          }
+        }
+      });
+
+      it('should throw error if no pending offer', () => {
+        const state = initializeGameState();
+
+        expect(() => replaceStickInInventory(state, 0)).toThrow(
+          'Cannot replace stick: no pending offer'
+        );
+      });
+
+      it('should throw error for invalid slot index', () => {
+        let state = initializeGameState();
+        state = offerStick(state, STICK_POOL[0]);
+
+        expect(() => replaceStickInInventory(state, -1)).toThrow(
+          'Invalid slot index: must be 0-3'
+        );
+        expect(() => replaceStickInInventory(state, 4)).toThrow(
+          'Invalid slot index: must be 0-3'
+        );
+      });
+    });
+
+    describe('discardStickOffer', () => {
+      it('should clear pending offer without changing inventory', () => {
+        let state = initializeGameState();
+        const originalInventory = [...state.stickInventory];
+        state = offerStick(state, STICK_POOL[0]);
+
+        const newState = discardStickOffer(state);
+
+        expect(newState.pendingStickOffer).toBeNull();
+        expect(newState.stickInventory).toEqual(originalInventory);
+      });
+
+      it('should throw error if no pending offer', () => {
+        const state = initializeGameState();
+
+        expect(() => discardStickOffer(state)).toThrow(
+          'Cannot discard stick: no pending offer'
+        );
+      });
+    });
+  });
+
+  describe('Special Node Event Handling', () => {
+    describe('updateSpecialNodes', () => {
+      it('should update special nodes mapping', () => {
+        const state = initializeGameState();
+        const newSpecialNodes = createInitialSpecialNodes();
+
+        const newState = updateSpecialNodes(state, newSpecialNodes);
+
+        expect(newState.specialNodes).toEqual(newSpecialNodes);
+      });
+
+      it('should replace existing special nodes mapping', () => {
+        const initialSpecialNodes = createInitialSpecialNodes();
+        const state = initializeGameState(initialSpecialNodes);
+        
+        // Create a different special nodes mapping
+        const newSpecialNodes = createInitialSpecialNodes(undefined, () => 0.5);
+
+        const newState = updateSpecialNodes(state, newSpecialNodes);
+
+        expect(newState.specialNodes).toEqual(newSpecialNodes);
+        expect(newState.specialNodes).not.toEqual(initialSpecialNodes);
+      });
     });
   });
 });

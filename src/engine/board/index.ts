@@ -160,3 +160,82 @@ export function traverseSteps(
 export function isBranchNode(nodeId: NodeId): boolean {
   return BOARD_GRAPH[nodeId]?.isBranchNode ?? false;
 }
+
+/**
+ * Special node types for node events
+ */
+export type SpecialNodeType = 'NORMAL' | 'STICK' | 'REFRESH';
+
+/**
+ * Configuration for special node placement
+ */
+export interface SpecialNodeConfig {
+  stickCount: number;      // Number of STICK nodes to place
+  refreshCount: number;    // Number of REFRESH nodes to place
+  excludedNodeIds: NodeId[]; // Nodes that cannot be special nodes
+}
+
+/**
+ * Default special node configuration per MVP spec
+ */
+export const DEFAULT_SPECIAL_NODE_CONFIG: SpecialNodeConfig = {
+  stickCount: 5,
+  refreshCount: 2,
+  excludedNodeIds: ['O0', 'O5', 'O10', 'C', 'O20'],
+};
+
+/**
+ * Get all eligible nodes for special node placement
+ * Excludes branch nodes, HOME (O0), and O20
+ */
+export function getEligibleNodes(excludedNodeIds: NodeId[] = DEFAULT_SPECIAL_NODE_CONFIG.excludedNodeIds): NodeId[] {
+  const allNodeIds = Object.keys(BOARD_GRAPH);
+  return allNodeIds.filter(nodeId => !excludedNodeIds.includes(nodeId));
+}
+
+/**
+ * Create initial special node assignments
+ * Returns a mapping of NodeId -> SpecialNodeType
+ * 
+ * @param config Optional configuration (defaults to DEFAULT_SPECIAL_NODE_CONFIG)
+ * @param rng Optional RNG function for deterministic testing (defaults to Math.random)
+ */
+export function createInitialSpecialNodes(
+  config: SpecialNodeConfig = DEFAULT_SPECIAL_NODE_CONFIG,
+  rng: () => number = Math.random
+): Record<NodeId, SpecialNodeType> {
+  const eligibleNodes = getEligibleNodes(config.excludedNodeIds);
+  const result: Record<NodeId, SpecialNodeType> = {};
+  
+  // Initialize all nodes as NORMAL
+  for (const nodeId of Object.keys(BOARD_GRAPH)) {
+    result[nodeId] = 'NORMAL';
+  }
+
+  // Ensure we have enough eligible nodes
+  const totalSpecialNodes = config.stickCount + config.refreshCount;
+  if (totalSpecialNodes > eligibleNodes.length) {
+    throw new Error(
+      `Not enough eligible nodes (${eligibleNodes.length}) for ${totalSpecialNodes} special nodes`
+    );
+  }
+
+  // Shuffle eligible nodes using Fisher-Yates algorithm
+  const shuffled = [...eligibleNodes];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+
+  // Assign STICK nodes
+  for (let i = 0; i < config.stickCount; i++) {
+    result[shuffled[i]] = 'STICK';
+  }
+
+  // Assign REFRESH nodes
+  for (let i = config.stickCount; i < config.stickCount + config.refreshCount; i++) {
+    result[shuffled[i]] = 'REFRESH';
+  }
+
+  return result;
+}

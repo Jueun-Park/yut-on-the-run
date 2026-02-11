@@ -7,9 +7,13 @@
  * - Hand tokens (accumulated throw results)
  * - Throws remaining counter
  * - Piece/stack positions
+ * - Stick inventory (4 slots)
+ * - Special nodes and node events
  */
 
-import type { NodeId } from '../board';
+import type { NodeId, SpecialNodeType } from '../board';
+import type { Stick } from '../content/sticks';
+import { BASIC_STICK } from '../content/sticks';
 
 export const GamePhase = {
   THROW: 'THROW',
@@ -61,17 +65,28 @@ export interface GameState {
   pieces: Piece[];
   stacks: Stack[]; // Stacks currently on the board
   artifacts: Artifact[]; // Collected artifacts
+  // Stick inventory (4 slots)
+  stickInventory: [Stick, Stick, Stick, Stick];
+  // Special nodes mapping
+  specialNodes: Record<NodeId, SpecialNodeType>;
   // For reward phase
   pendingReward: {
     stackSize: number;
     candidates: Artifact[];
   } | null;
+  // For STICK node events
+  pendingStickOffer: {
+    offeredStick: Stick;
+  } | null;
 }
 
 /**
  * Initialize a new game state
+ * @param specialNodes Optional pre-initialized special nodes mapping
  */
-export function initializeGameState(): GameState {
+export function initializeGameState(
+  specialNodes?: Record<NodeId, SpecialNodeType>
+): GameState {
   return {
     phase: GamePhase.THROW,
     turn: 1,
@@ -85,7 +100,10 @@ export function initializeGameState(): GameState {
     ],
     stacks: [],
     artifacts: [],
+    stickInventory: [BASIC_STICK, BASIC_STICK, BASIC_STICK, BASIC_STICK],
+    specialNodes: specialNodes ?? {},
     pendingReward: null,
+    pendingStickOffer: null,
   };
 }
 
@@ -334,5 +352,82 @@ export function advanceTurn(state: GameState): GameState {
     phase: GamePhase.THROW,
     turn: state.turn + 1,
     throwsRemaining: 1,
+  };
+}
+
+/**
+ * Stick Inventory Management
+ */
+
+/**
+ * Offer a stick to the player (triggered by STICK node)
+ */
+export function offerStick(state: GameState, stick: Stick): GameState {
+  if (state.pendingStickOffer !== null) {
+    throw new Error('Cannot offer stick: pending offer already exists');
+  }
+
+  return {
+    ...state,
+    pendingStickOffer: {
+      offeredStick: stick,
+    },
+  };
+}
+
+/**
+ * Replace a stick in the inventory with the offered stick
+ * @param slotIndex Index (0-3) of the slot to replace
+ */
+export function replaceStickInInventory(
+  state: GameState,
+  slotIndex: number
+): GameState {
+  if (state.pendingStickOffer === null) {
+    throw new Error('Cannot replace stick: no pending offer');
+  }
+
+  if (slotIndex < 0 || slotIndex > 3) {
+    throw new Error('Invalid slot index: must be 0-3');
+  }
+
+  const newInventory = [...state.stickInventory] as [Stick, Stick, Stick, Stick];
+  newInventory[slotIndex] = state.pendingStickOffer.offeredStick;
+
+  return {
+    ...state,
+    stickInventory: newInventory,
+    pendingStickOffer: null,
+  };
+}
+
+/**
+ * Discard the offered stick (keep current inventory unchanged)
+ */
+export function discardStickOffer(state: GameState): GameState {
+  if (state.pendingStickOffer === null) {
+    throw new Error('Cannot discard stick: no pending offer');
+  }
+
+  return {
+    ...state,
+    pendingStickOffer: null,
+  };
+}
+
+/**
+ * Special Node Event Handling
+ */
+
+/**
+ * Update special nodes mapping (used for REFRESH node effect)
+ */
+export function updateSpecialNodes(
+  state: GameState,
+  newSpecialNodes: Record<NodeId, SpecialNodeType>
+): GameState {
+  return {
+    ...state,
+    specialNodes: newSpecialNodes,
   };
 }

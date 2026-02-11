@@ -2,41 +2,40 @@ import { describe, it, expect } from 'vitest';
 import {
   throwYut,
   grantsBonus,
-  DEFAULT_STICK,
   sampleStick,
   sample4Sticks,
   mapBackCountToResult,
-  type Stick,
 } from '../index';
+import { BASIC_STICK, type Stick } from '../../content/sticks';
 
 describe('RNG Module - 4-Stick Sampling', () => {
-  describe('DEFAULT_STICK', () => {
+  describe('BASIC_STICK', () => {
     it('should have 50% back probability', () => {
-      expect(DEFAULT_STICK.backProbability).toBe(0.5);
+      expect(BASIC_STICK.backProbability).toBe(0.5);
     });
   });
 
   describe('sampleStick', () => {
     it('should return Back when rng returns below backProbability', () => {
-      const stick: Stick = { id: 'test', name: 'Test', backProbability: 0.7 };
+      const stick: Stick = { id: 'test', name: 'Test', description: 'Test stick', backProbability: 0.7 };
       const result = sampleStick(stick, () => 0.5); // 0.5 < 0.7
       expect(result).toBe('Back');
     });
 
     it('should return Front when rng returns at or above backProbability', () => {
-      const stick: Stick = { id: 'test', name: 'Test', backProbability: 0.3 };
+      const stick: Stick = { id: 'test', name: 'Test', description: 'Test stick', backProbability: 0.3 };
       const result = sampleStick(stick, () => 0.5); // 0.5 >= 0.3
       expect(result).toBe('Front');
     });
 
     it('should return Front for backProbability 0', () => {
-      const stick: Stick = { id: 'test', name: 'Test', backProbability: 0 };
+      const stick: Stick = { id: 'test', name: 'Test', description: 'Test stick', backProbability: 0 };
       const result = sampleStick(stick, () => 0.5);
       expect(result).toBe('Front');
     });
 
     it('should return Back for backProbability 1', () => {
-      const stick: Stick = { id: 'test', name: 'Test', backProbability: 1 };
+      const stick: Stick = { id: 'test', name: 'Test', description: 'Test stick', backProbability: 1 };
       const result = sampleStick(stick, () => 0.5);
       expect(result).toBe('Back');
     });
@@ -45,30 +44,30 @@ describe('RNG Module - 4-Stick Sampling', () => {
   describe('sample4Sticks', () => {
     it('should throw error if not exactly 4 sticks', () => {
       expect(() => sample4Sticks([])).toThrow('Must provide exactly 4 sticks');
-      expect(() => sample4Sticks([DEFAULT_STICK])).toThrow(
+      expect(() => sample4Sticks([BASIC_STICK])).toThrow(
         'Must provide exactly 4 sticks'
       );
       expect(() =>
-        sample4Sticks([DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK])
+        sample4Sticks([BASIC_STICK, BASIC_STICK, BASIC_STICK])
       ).toThrow('Must provide exactly 4 sticks');
     });
 
     it('should return 0 when all sticks land Front', () => {
-      const sticks = [DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK];
+      const sticks = [BASIC_STICK, BASIC_STICK, BASIC_STICK, BASIC_STICK];
       // rng always returns 1.0, which is >= backProbability (0.5), so all Front
       const backCount = sample4Sticks(sticks, () => 1.0);
       expect(backCount).toBe(0);
     });
 
     it('should return 4 when all sticks land Back', () => {
-      const sticks = [DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK];
+      const sticks = [BASIC_STICK, BASIC_STICK, BASIC_STICK, BASIC_STICK];
       // rng always returns 0.0, which is < backProbability (0.5), so all Back
       const backCount = sample4Sticks(sticks, () => 0.0);
       expect(backCount).toBe(4);
     });
 
     it('should count back results correctly with mixed results', () => {
-      const sticks = [DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK];
+      const sticks = [BASIC_STICK, BASIC_STICK, BASIC_STICK, BASIC_STICK];
       // Return sequence: [0.0, 0.6, 0.3, 0.7]
       // With backProbability=0.5: [Back, Front, Back, Front] = 2 backs
       let callCount = 0;
@@ -81,7 +80,7 @@ describe('RNG Module - 4-Stick Sampling', () => {
     });
 
     it('should sample each stick independently', () => {
-      const sticks = [DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK];
+      const sticks = [BASIC_STICK, BASIC_STICK, BASIC_STICK, BASIC_STICK];
       // Create controlled sequence to verify independence
       let callCount = 0;
       const sequence = [0.2, 0.8, 0.1, 0.9]; // Back, Front, Back, Front
@@ -175,7 +174,7 @@ describe('RNG Module - 4-Stick Sampling', () => {
     });
 
     it('should be deterministic with controlled RNG', () => {
-      const sticks = [DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK];
+      const sticks = [BASIC_STICK, BASIC_STICK, BASIC_STICK, BASIC_STICK];
       
       // All backs (backCount=4) → YUT
       const result1 = throwYut(sticks, () => 0.0);
@@ -192,7 +191,7 @@ describe('RNG Module - 4-Stick Sampling', () => {
     });
 
     it('should sample 4 independent sticks per throw', () => {
-      const sticks = [DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK, DEFAULT_STICK];
+      const sticks = [BASIC_STICK, BASIC_STICK, BASIC_STICK, BASIC_STICK];
       let callCount = 0;
       const mockRng = () => {
         callCount++;
