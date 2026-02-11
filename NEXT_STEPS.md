@@ -129,6 +129,11 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 
 #### 3.1 Game Layout & Header (`src/components/`)
 - [ ] Create main game layout component
+  - Mobile-first vertical layout
+  - Sticky header (top)
+  - Square board area (center)
+  - Sticky action tray (bottom)
+  - Desktop: same layout with side margins
 - [ ] Implement header with turn counter
 - [ ] Add game phase indicator
 - [ ] Style with Tailwind
@@ -148,36 +153,55 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - Transition to PLAY phase
 
 #### 3.3 Board Visualization (`src/components/Board.tsx`)
-- [ ] Create board layout
-  - Visualize outer path (O1-O20)
-  - Visualize center (C)
-  - Visualize diagonals (A1-A4, B1-B4)
-  - HOME area for unspawned pieces
-  - FINISHED area for completed pieces
+- [ ] Create SVG board with traditional Yut board layout
+  - Fixed coordinate layout
+  - O1 positioned at **bottom-right**
+  - Outer path numbering **counter-clockwise** from O1 to O20
+  - Emphasized (large) nodes: **O5, O10, O15, O20, C**
+  - Draw connection lines from engine graph edges only (BOARD_GRAPH from -> to)
+  - Do NOT draw decorative lines that are not edges
+- [ ] Implement node rendering
+  - Each node has invisible circular touch target of at least 44px
+  - Special nodes indicated by **icon + color**
+  - Valid actions highlighted/enabled only (Constraint UI)
+- [ ] Implement HOME area
+  - Outside board UI (may not be rendered as board node)
+  - Display count of unspawned pieces
+- [ ] Implement FINISHED area
+  - Inside board at **bottom internal area**
+  - Horizontal row of **4 slots**
+  - Slots fill to represent count only (no piece identification)
 - [ ] Display pieces/stacks on nodes
-  - Show stack size
+  - Single piece: draw circular pawn smaller than node
+  - Stacked (2+): show numeric badge 2/3/4 on pawn
+  - Identical appearance for all pieces (no per-piece ID or color)
   - Highlight selectable stacks
 - [ ] Add visual feedback
   - Hover states
   - Selected state
-  - Move preview (optional)
+  - Movement preview: highlight **destination node only** (no path preview)
 
 #### 3.4 Play Phase UI (`src/components/PlayPhase.tsx`)
 - [ ] Display hand tokens as selectable buttons/chips
-- [ ] Implement token selection flow
+- [ ] Implement immediate move execution flow (no confirm button)
   1. Player clicks token from hand
   2. System prompts: select stack or HOME
-  3. If branch node: prompt branch selection
-  4. Execute move and update board
-  5. Remove consumed token from hand
+  3. Highlight enabled target nodes (Constraint UI)
+  4. If branch node: highlight two candidate next nodes on board
+  5. Player selects destination node
+  6. **Immediate move execution** (no confirm button)
+  7. Remove consumed token from hand
 - [ ] Implement target selection UI
-  - Clickable stacks on board
-  - HOME button for spawning
+  - Clickable stacks on board (only valid targets)
+  - HOME button for spawning (when applicable)
   - Visual feedback for valid targets
-- [ ] Implement branch selection modal
-  - Show available paths at O5, O10, C
-  - Display path options clearly
-  - Confirm selection
+- [ ] Implement on-board branch selection (no modal)
+  - When branching required, highlight two candidate next nodes
+  - Player taps one to select
+  - Selection executes immediately
+- [ ] Handle special node landings
+  - **STICK landing**: mandatory modal blocks other input
+  - **REFRESH landing**: toast notification
 
 #### 3.5 Reward Modal (`src/components/RewardModal.tsx`)
 - [ ] Create modal overlay
@@ -314,7 +338,8 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 - [ ] Undo/redo functionality
 - [ ] Animation system
 - [ ] Sound effects
-- [ ] Mobile optimization
+- [ ] Pinch-zoom support (revisit after playtesting)
+- [ ] Advanced mobile optimization
 - [ ] Analytics/statistics tracking
 - [ ] Leaderboard system
 - [ ] Tutorial mode
