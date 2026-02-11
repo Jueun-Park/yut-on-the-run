@@ -99,11 +99,11 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - [ ] Add REFRESH event trigger and special node re-randomization
 
 #### 2.4 RNG with 4-Stick Sampling (`src/engine/rng/`)
-- [ ] Implement 4-stick throw model
-  - [ ] Define stick interface (Front/Back probabilities, effects)
-  - [ ] Implement simultaneous 4-stick sampling
-  - [ ] Calculate backCount (number of Back results, 0..4)
-  - [ ] Map backCount to outcome:
+- [x] Implement 4-stick throw model
+  - [x] Define stick interface (Front/Back probabilities, effects)
+  - [x] Implement simultaneous 4-stick sampling
+  - [x] Calculate backCount (number of Back results, 0..4)
+  - [x] Map backCount to outcome:
     - backCount=1 → DO (1 step)
     - backCount=2 → GAE (2 steps)
     - backCount=3 → GEOL (3 steps)
@@ -239,10 +239,10 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - Merged stack moves together
 
 #### 4.4 RNG Tests (`src/engine/rng/__tests__/`)
-- [ ] Test 4-stick sampling
-  - [ ] Test backCount calculation (0..4)
-  - [ ] Test backCount → outcome mapping (0→MO, 1→DO, 2→GAE, 3→GEOL, 4→YUT)
-  - [ ] Verify each stick samples independently
+- [x] Test 4-stick sampling
+  - [x] Test backCount calculation (0..4)
+  - [x] Test backCount → outcome mapping (0→MO, 1→DO, 2→GAE, 3→GEOL, 4→YUT)
+  - [x] Verify each stick samples independently
 - [x] Test bonus throw logic (YUT/MO → +1 throw)
 
 #### 4.5 State Machine Tests (`src/engine/state/__tests__/`)
