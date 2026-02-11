@@ -202,9 +202,6 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 - [ ] Handle special node landings
   - **STICK landing**: mandatory modal blocks other input
   - **REFRESH landing**: toast notification
-- [ ] Add light one-line comment about mis-taps
-  - "미스터치도 게임의 일부…"
-  - Not a major UX pillar, just a light acknowledgment
 
 #### 3.5 Reward Modal (`src/components/RewardModal.tsx`)
 - [ ] Create modal overlay
