@@ -98,11 +98,15 @@ export function initializeGameState(
   let seed = '';
   let nodes: Record<NodeId, SpecialNodeType> | undefined;
   
-  if (typeof seedOrSpecialNodes === 'string' || seedOrSpecialNodes === undefined) {
-    seed = seedOrSpecialNodes || '';
+  if (typeof seedOrSpecialNodes === 'string') {
+    seed = seedOrSpecialNodes;
+    nodes = specialNodes;
+  } else if (seedOrSpecialNodes === undefined) {
+    seed = '';
     nodes = specialNodes;
   } else {
-    // First arg is special nodes (old signature)
+    // First arg is special nodes (old signature for backward compatibility)
+    seed = '';
     nodes = seedOrSpecialNodes;
   }
   

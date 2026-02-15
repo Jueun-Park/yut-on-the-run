@@ -17,15 +17,16 @@ interface GameStateContextType {
   gameState: GameState;
   dispatch: Dispatch<GameAction>;
   // Selection state for board interaction (derived from gameState)
+  // Note: selectableNodes and destinationNodes are placeholders until full gameplay logic is implemented
   selectedNode: NodeId | null;
-  selectableNodes: NodeId[];
-  destinationNodes: NodeId[];
+  selectableNodes: NodeId[]; // TODO: compute from game state based on valid moves
+  destinationNodes: NodeId[]; // TODO: compute from game state based on selected token
   // Actions (convenience methods that dispatch actions)
   selectNode: (nodeId: NodeId) => void;
   resetSelection: () => void;
   // Phase transitions (stubs for now)
   startMovePhase: () => void;
-  selectHandToken: () => void;
+  selectHandToken: () => void; // TODO: implement with full gameplay logic
 }
 
 const GameStateContext = createContext<GameStateContextType | undefined>(undefined);
@@ -54,10 +55,10 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
   };
 
   const selectHandToken = () => {
-    // Stub: mark a token as selected and show valid destinations
     // TODO: Accept token index parameter when implementing full gameplay
     // TODO: Calculate actual valid destinations based on game state
-    // For now, this is just a placeholder
+    // This is a placeholder stub for future implementation
+    console.warn('selectHandToken is not yet implemented');
   };
 
   return (
