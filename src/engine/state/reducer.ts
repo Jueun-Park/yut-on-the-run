@@ -21,7 +21,8 @@ export type GameAction =
   | { type: 'ADD_HAND_TOKEN'; token: HandToken }
   | { type: 'REMOVE_HAND_TOKEN'; index: number }
   | { type: 'SET_THROWS_REMAINING'; count: number }
-  | { type: 'DECREMENT_THROWS_REMAINING' };
+  | { type: 'DECREMENT_THROWS_REMAINING' }
+  | { type: 'INCREMENT_THROWS_REMAINING' };
 
 /**
  * Game Reducer
@@ -90,6 +91,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       return {
         ...state,
         throwsRemaining: Math.max(0, state.throwsRemaining - 1),
+      };
+
+    case 'INCREMENT_THROWS_REMAINING':
+      return {
+        ...state,
+        throwsRemaining: state.throwsRemaining + 1,
       };
 
     default:

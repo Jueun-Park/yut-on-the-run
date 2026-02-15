@@ -175,4 +175,20 @@ describe('gameReducer', () => {
       expect(newState.throwsRemaining).toBe(0);
     });
   });
+
+  describe('INCREMENT_THROWS_REMAINING', () => {
+    it('should increment throws remaining', () => {
+      const state = { ...initializeGameState(), throwsRemaining: 1 };
+      const newState = gameReducer(state, { type: 'INCREMENT_THROWS_REMAINING' });
+      
+      expect(newState.throwsRemaining).toBe(2);
+    });
+
+    it('should increment from zero', () => {
+      const state = { ...initializeGameState(), throwsRemaining: 0 };
+      const newState = gameReducer(state, { type: 'INCREMENT_THROWS_REMAINING' });
+      
+      expect(newState.throwsRemaining).toBe(1);
+    });
+  });
 });
