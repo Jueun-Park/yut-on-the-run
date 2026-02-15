@@ -135,15 +135,15 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 ### Milestone 3: UI Implementation
 
 #### 3.1 Game Layout & Header (`src/components/`)
-- [ ] Create main game layout component
+- [x] Create main game layout component
   - Mobile-first vertical layout
   - Sticky header (top)
   - Square board area (center)
   - Sticky action tray (bottom)
   - Desktop: same layout with side margins
-- [ ] Implement header with turn counter
-- [ ] Add game phase indicator
-- [ ] Style with Tailwind
+- [x] Implement header with turn counter
+- [x] Add game phase indicator
+- [x] Style with Tailwind
 
 #### 3.1.5 Settings UI (`src/components/Settings.tsx`)
 - [x] Add Settings gear button (⚙️) in header
@@ -161,16 +161,16 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 - [x] Style with Tailwind/shadcn/ui
 
 #### 3.2 Throw Phase UI (`src/components/ThrowPhase.tsx`)
-- [ ] Display throws remaining counter
+- [x] Display throws remaining counter (scaffolded in GameLayout)
 - [ ] Implement "Throw" button
   - Call RNG on click
   - Add result to hand
   - Update throws remaining
   - Handle 윷/모 bonus throws
-- [ ] Display accumulated hand tokens
+- [x] Display accumulated hand tokens (scaffolded in GameLayout)
   - Show token type (도/개/걸/윷/모)
   - Show visual representation
-- [ ] Implement "Start Move" button
+- [x] Implement "Start Move" button (scaffolded in GameLayout)
   - Enable when throwsRemaining === 0
   - Transition to PLAY phase
 
@@ -196,17 +196,30 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - [ ] RNG consumption occurs only at commit time
 
 #### 3.3 Board Visualization (`src/components/Board.tsx`)
-- [ ] Create SVG board with traditional Yut board layout
+- [x] Create SVG board with traditional Yut board layout
   - Fixed coordinate layout
   - O1 positioned at **bottom-right**
   - Outer path numbering **counter-clockwise** from O1 to O20
   - Emphasized (large) nodes: **O5, O10, O15, O20, C**
   - Draw connection lines from engine graph edges only (BOARD_GRAPH from -> to)
   - Do NOT draw decorative lines that are not edges
-- [ ] Implement node rendering
+- [x] Implement node rendering
   - Each node has invisible circular touch target of at least 44px
-  - Special nodes indicated by **icon + color**
+  - Special nodes indicated by **icon + color** (ready for implementation)
   - Valid actions highlighted/enabled only (Constraint UI)
+- [x] Implement coordinate system (BoardCoordinates.ts)
+  - Normalized viewBox (0-1000) for responsive scaling
+  - Proper positioning with O1 at bottom-right
+  - Counter-clockwise numbering
+  - Diagonal angles computed from outer ring positions
+- [x] Add visual feedback
+  - Hover states (via hit circles)
+  - Selected state (blue highlight)
+  - Movement preview: highlight **destination node only** (yellow/green highlight)
+- [x] Implement GameStateProvider with phase management
+  - Phase-driven UI scaffolding (THROW, PLAY, REWARD, GAME_OVER)
+  - Selection state management for board interactions
+  - Action callbacks for node clicks
 - [ ] Implement HOME area
   - Outside board UI (may not be rendered as board node)
   - Display count of unspawned pieces
@@ -219,10 +232,6 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - Stacked (2+): show numeric badge 2/3/4 on pawn
   - Identical appearance for all pieces (no per-piece ID or color)
   - Highlight selectable stacks
-- [ ] Add visual feedback
-  - Hover states
-  - Selected state
-  - Movement preview: highlight **destination node only** (no path preview)
 
 #### 3.4 Play Phase UI (`src/components/PlayPhase.tsx`)
 - [ ] Display hand tokens as selectable buttons/chips

@@ -23,7 +23,7 @@ interface GameStateContextType {
   resetSelection: () => void;
   // Phase transitions (stubs for now)
   startMovePhase: () => void;
-  selectHandToken: (index: number) => void;
+  selectHandToken: () => void;
 }
 
 const GameStateContext = createContext<GameStateContextType | undefined>(undefined);
@@ -39,7 +39,6 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
 
   const selectNode = (nodeId: NodeId) => {
     // Minimal implementation - just track selection
-    console.log('Node selected:', nodeId);
     setSelectedNode(nodeId);
   };
 
@@ -57,10 +56,10 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  const selectHandToken = (index: number) => {
+  const selectHandToken = () => {
     // Stub: mark a token as selected and show valid destinations
-    console.log('Hand token selected:', index);
     // For now, just show all nodes as selectable for testing
+    // TODO: Accept token index parameter when implementing full gameplay
     setSelectableNodes(['O1', 'O5', 'O10', 'C']);
   };
 

@@ -73,7 +73,7 @@ export function GameLayout() {
                   <Button
                     key={index}
                     variant="outline"
-                    onClick={() => selectHandToken(index)}
+                    onClick={() => selectHandToken()}
                   >
                     {token.result} ({token.steps})
                   </Button>

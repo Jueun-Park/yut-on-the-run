@@ -44,6 +44,15 @@ function getOuterRingPosition(nodeNumber: number): { x: number; y: number } {
 }
 
 /**
+ * Calculate the angle in degrees for a given outer ring node
+ */
+function getOuterRingAngle(nodeNumber: number): number {
+  const anglePerNode = 18;
+  const startAngle = -45;
+  return startAngle + (nodeNumber - 1) * anglePerNode;
+}
+
+/**
  * Calculate position on diagonal path
  */
 function getDiagonalPosition(
@@ -88,17 +97,19 @@ export const NODE_COORDINATES: Record<NodeId, NodeCoordinate> = {
   // Center
   C: { x: CENTER_X, y: CENTER_Y, emphasized: true },
   
-  // Diagonal A: O5 (27°) → A1 → A2 → C → A3 → A4 → O15 (207°)
-  A1: { ...getDiagonalPosition(27, 'middle'), emphasized: false },
-  A2: { ...getDiagonalPosition(27, 'inner'), emphasized: false },
-  A3: { ...getDiagonalPosition(207, 'inner'), emphasized: false },
-  A4: { ...getDiagonalPosition(207, 'middle'), emphasized: false },
+  // Diagonal A: O5 → A1 → A2 → C → A3 → A4 → O15
+  // Using angles derived from outer ring positions
+  A1: { ...getDiagonalPosition(getOuterRingAngle(5), 'middle'), emphasized: false },
+  A2: { ...getDiagonalPosition(getOuterRingAngle(5), 'inner'), emphasized: false },
+  A3: { ...getDiagonalPosition(getOuterRingAngle(15), 'inner'), emphasized: false },
+  A4: { ...getDiagonalPosition(getOuterRingAngle(15), 'middle'), emphasized: false },
   
-  // Diagonal B: O10 (117°) → B1 → B2 → C → B3 → B4 → O20 (297°)
-  B1: { ...getDiagonalPosition(117, 'middle'), emphasized: false },
-  B2: { ...getDiagonalPosition(117, 'inner'), emphasized: false },
-  B3: { ...getDiagonalPosition(297, 'inner'), emphasized: false },
-  B4: { ...getDiagonalPosition(297, 'middle'), emphasized: false },
+  // Diagonal B: O10 → B1 → B2 → C → B3 → B4 → O20
+  // Using angles derived from outer ring positions
+  B1: { ...getDiagonalPosition(getOuterRingAngle(10), 'middle'), emphasized: false },
+  B2: { ...getDiagonalPosition(getOuterRingAngle(10), 'inner'), emphasized: false },
+  B3: { ...getDiagonalPosition(getOuterRingAngle(20), 'inner'), emphasized: false },
+  B4: { ...getDiagonalPosition(getOuterRingAngle(20), 'middle'), emphasized: false },
   
   // O0 (HOME) is not rendered on the board
   O0: { x: -100, y: -100, emphasized: false },
