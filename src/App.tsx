@@ -1,10 +1,13 @@
 import { ThemeProvider } from './components/theme-provider'
 import { GameLayout } from './components/GameLayout'
+import { GameStateProvider } from './hooks/useGameState'
 
 function App() {
   return (
     <ThemeProvider defaultTheme="system" storageKey="yut-theme">
-      <GameLayout />
+      <GameStateProvider>
+        <GameLayout />
+      </GameStateProvider>
     </ThemeProvider>
   )
 }
