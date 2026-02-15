@@ -148,8 +148,11 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
       try {
         const result = validateMove(gameState, target, token.steps);
         if (result.needsBranchChoice) {
-          // TODO: Show branch choice UI (for now, just log)
-          console.warn('Branch choice needed but not provided', result.availableBranches);
+          // Branch choice needed but not provided
+          // This is a known limitation - branch selection UI not yet implemented
+          // For now, we log a warning and don't execute the move
+          console.warn('Branch choice needed but not provided. Available branches:', result.availableBranches);
+          console.warn('Branch selection UI is not yet implemented. Please select a different move.');
           return;
         }
       } catch (error) {

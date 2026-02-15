@@ -111,12 +111,12 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
       const newThrowsRemaining = Math.max(0, state.throwsRemaining - 1);
       
       // Check if result grants bonus throw (YUT or MO)
-      const grantsBonus = action.token.result === 'YUT' || action.token.result === 'MO';
+      const shouldGrantBonus = action.token.result === 'YUT' || action.token.result === 'MO';
       
       return {
         ...state,
         hand: newHand,
-        throwsRemaining: grantsBonus ? newThrowsRemaining + 1 : newThrowsRemaining,
+        throwsRemaining: shouldGrantBonus ? newThrowsRemaining + 1 : newThrowsRemaining,
       };
     }
 
