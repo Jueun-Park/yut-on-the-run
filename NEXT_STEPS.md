@@ -162,7 +162,7 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 
 #### 3.2 Throw Phase UI (`src/components/ThrowPhase.tsx`)
 - [x] Display throws remaining counter (scaffolded in GameLayout)
-- [ ] Implement "Throw" button
+- [x] Implement "Throw" button
   - Call RNG on click
   - Add result to hand
   - Update throws remaining
@@ -175,25 +175,25 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - Transition to PLAY phase
 
 #### 3.2.5 Throw Button "손맛" (Haptics UX)
-- [ ] Add haptics utility wrapper (no toggle)
-  - [ ] Use Web Vibration API (`navigator.vibrate`) when supported
-  - [ ] Silently no-op when API unavailable
-  - [ ] No user-facing vibration toggle setting
-- [ ] Implement Throw button rolling state machine with pointer events
-  - [ ] On pointer down: enter rolling state
-  - [ ] Minimum rolling duration: 0.5s
-    - [ ] If released before 0.5s, keep rolling and commit at 0.5s
-  - [ ] Maximum rolling duration: 3.0s
-    - [ ] Auto-commit at 3.0s even without release
-  - [ ] If released after 0.5s but before 3.0s, commit immediately on release
-  - [ ] Handle pointer up/cancel/leave events to trigger commit respecting min/max timers
-- [ ] Implement haptics timing
-  - [ ] Tick vibration every 500ms during rolling (suggested 5–10ms)
-  - [ ] Confirmation vibration once on commit (suggested 30–50ms)
-  - [ ] If tick and commit coincide, commit vibration takes priority; stop tick timer on commit
-- [ ] Ensure RNG consumed exactly once per committed throw
-  - [ ] Rolling visuals must NOT consume RNG
-  - [ ] RNG consumption occurs only at commit time
+- [x] Add haptics utility wrapper (no toggle)
+  - [x] Use Web Vibration API (`navigator.vibrate`) when supported
+  - [x] Silently no-op when API unavailable
+  - [x] No user-facing vibration toggle setting
+- [x] Implement Throw button rolling state machine with pointer events
+  - [x] On pointer down: enter rolling state
+  - [x] Minimum rolling duration: 0.5s
+    - [x] If released before 0.5s, keep rolling and commit at 0.5s
+  - [x] Maximum rolling duration: 3.0s
+    - [x] Auto-commit at 3.0s even without release
+  - [x] If released after 0.5s but before 3.0s, commit immediately on release
+  - [x] Handle pointer up/cancel/leave events to trigger commit respecting min/max timers
+- [x] Implement haptics timing
+  - [x] Tick vibration every 500ms during rolling (suggested 5–10ms)
+  - [x] Confirmation vibration once on commit (suggested 30–50ms)
+  - [x] If tick and commit coincide, commit vibration takes priority; stop tick timer on commit
+- [x] Ensure RNG consumed exactly once per committed throw
+  - [x] Rolling visuals must NOT consume RNG
+  - [x] RNG consumption occurs only at commit time
 
 #### 3.3 Board Visualization (`src/components/Board.tsx`)
 - [x] Create SVG board with traditional Yut board layout
