@@ -88,17 +88,17 @@ export const NODE_COORDINATES: Record<NodeId, NodeCoordinate> = {
   // Center
   C: { x: CENTER_X, y: CENTER_Y, emphasized: true },
   
-  // Diagonal A: O5 (45°) → A1 → A2 → C → A3 → A4 → O15 (135°)
-  A1: { ...getDiagonalPosition(45, 'middle'), emphasized: false },
-  A2: { ...getDiagonalPosition(45, 'inner'), emphasized: false },
-  A3: { ...getDiagonalPosition(135, 'inner'), emphasized: false },
-  A4: { ...getDiagonalPosition(135, 'middle'), emphasized: false },
+  // Diagonal A: O5 (27°) → A1 → A2 → C → A3 → A4 → O15 (207°)
+  A1: { ...getDiagonalPosition(27, 'middle'), emphasized: false },
+  A2: { ...getDiagonalPosition(27, 'inner'), emphasized: false },
+  A3: { ...getDiagonalPosition(207, 'inner'), emphasized: false },
+  A4: { ...getDiagonalPosition(207, 'middle'), emphasized: false },
   
-  // Diagonal B: O10 (135°) → B1 → B2 → C → B3 → B4 → O20 (225°)
-  B1: { ...getDiagonalPosition(135, 'middle'), emphasized: false },
-  B2: { ...getDiagonalPosition(135, 'inner'), emphasized: false },
-  B3: { ...getDiagonalPosition(225, 'inner'), emphasized: false },
-  B4: { ...getDiagonalPosition(225, 'middle'), emphasized: false },
+  // Diagonal B: O10 (117°) → B1 → B2 → C → B3 → B4 → O20 (297°)
+  B1: { ...getDiagonalPosition(117, 'middle'), emphasized: false },
+  B2: { ...getDiagonalPosition(117, 'inner'), emphasized: false },
+  B3: { ...getDiagonalPosition(297, 'inner'), emphasized: false },
+  B4: { ...getDiagonalPosition(297, 'middle'), emphasized: false },
   
   // O0 (HOME) is not rendered on the board
   O0: { x: -100, y: -100, emphasized: false },
