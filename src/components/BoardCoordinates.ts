@@ -27,44 +27,42 @@ const MARGIN = 100; // Margin from edges
 
 /**
  * Calculate position on outer square ring
- * O1 is at bottom-right corner (starting position)
- * O20 is also at bottom-right corner (ending position, completing the loop)
  * Counter-clockwise flow: O1→O5 (right edge, up), O6→O10 (top edge, left), 
  *                         O11→O15 (left edge, down), O16→O20 (bottom edge, right)
- * 20 nodes total: 5 nodes per side (1 starting corner + 4 middle nodes per edge)
- * Corners at O5, O10, O15, O20
+ * 20 nodes total with 4 corners at O5, O10, O15, O20
+ * O1 and O20 are adjacent but different nodes (O20 at corner, O1 next to it)
  */
 function getOuterSquarePosition(nodeNumber: number): { x: number; y: number } {
-  // 20 nodes total, 4 sides with 5 nodes each
-  // Each visual side has 4 non-corner nodes + 1 corner
-  const nodesPerEdge = 4; // Non-corner nodes per edge
-  const spacing = BOARD_SIZE / (nodesPerEdge + 1); // +1 to account for spacing to corners
+  // 20 nodes total: 4 corners + 16 non-corner nodes
+  // Distribution: 4 nodes between each corner
+  const nodesPerEdge = 4; // Non-corner nodes between corners
+  const spacing = BOARD_SIZE / (nodesPerEdge + 1); // 5 spaces per edge (4 gaps + 2 corners)
   
   let x: number, y: number;
   
   if (nodeNumber >= 1 && nodeNumber <= 5) {
     // Right edge: O1-O5 (bottom to top)
-    // O1 at bottom-right corner going up to O5 at top-right corner
-    const pos = nodeNumber - 1; // 0 to 4
+    // O1 starts just above O20 (which is at bottom-right corner)
+    const pos = nodeNumber; // 1 to 5
     x = MARGIN + BOARD_SIZE;
     y = MARGIN + BOARD_SIZE - (pos * spacing);
   } else if (nodeNumber >= 6 && nodeNumber <= 10) {
     // Top edge: O6-O10 (right to left)
-    // Starting after O5 (top-right) to O10 (top-left corner)
-    const pos = nodeNumber - 6; // 0 to 4
-    x = MARGIN + BOARD_SIZE - ((pos + 1) * spacing);
+    // O6 starts just left of O5 (top-right corner)
+    const pos = nodeNumber - 5; // 1 to 5
+    x = MARGIN + BOARD_SIZE - (pos * spacing);
     y = MARGIN;
   } else if (nodeNumber >= 11 && nodeNumber <= 15) {
     // Left edge: O11-O15 (top to bottom)
-    // Starting after O10 (top-left) to O15 (bottom-left corner)
-    const pos = nodeNumber - 11; // 0 to 4
+    // O11 starts just below O10 (top-left corner)
+    const pos = nodeNumber - 10; // 1 to 5
     x = MARGIN;
-    y = MARGIN + ((pos + 1) * spacing);
+    y = MARGIN + (pos * spacing);
   } else if (nodeNumber >= 16 && nodeNumber <= 20) {
     // Bottom edge: O16-O20 (left to right)
-    // Starting after O15 (bottom-left) to O20 (bottom-right corner)
-    const pos = nodeNumber - 16; // 0 to 4
-    x = MARGIN + ((pos + 1) * spacing);
+    // O16 starts just right of O15 (bottom-left corner), ending at O20 (bottom-right corner)
+    const pos = nodeNumber - 15; // 1 to 5
+    x = MARGIN + (pos * spacing);
     y = MARGIN + BOARD_SIZE;
   } else {
     x = CENTER_X;
@@ -94,29 +92,32 @@ function getDiagonalPosition(
 
 /**
  * All node coordinates with emphasis markers
+ * O1-O20 distributed with 4 non-corner nodes between each corner
+ * Corners at O5 (top-right), O10 (top-left), O15 (bottom-left), O20 (bottom-right)
+ * O1 is adjacent to O20 but at a different position on the right edge
  */
 export const NODE_COORDINATES: Record<NodeId, NodeCoordinate> = {
-  // Outer ring O1-O20 (square layout, counter-clockwise from bottom-right)
-  O1: { ...getOuterSquarePosition(1), emphasized: false },
+  // Outer ring O1-O20 (square layout, counter-clockwise starting from right edge)
+  O1: { ...getOuterSquarePosition(1), emphasized: false }, // Right edge, just above O20
   O2: { ...getOuterSquarePosition(2), emphasized: false },
   O3: { ...getOuterSquarePosition(3), emphasized: false },
   O4: { ...getOuterSquarePosition(4), emphasized: false },
-  O5: { ...getOuterSquarePosition(5), emphasized: true }, // Branch node (top-right corner)
+  O5: { ...getOuterSquarePosition(5), emphasized: true }, // Top-right corner (branch node)
   O6: { ...getOuterSquarePosition(6), emphasized: false },
   O7: { ...getOuterSquarePosition(7), emphasized: false },
   O8: { ...getOuterSquarePosition(8), emphasized: false },
   O9: { ...getOuterSquarePosition(9), emphasized: false },
-  O10: { ...getOuterSquarePosition(10), emphasized: true }, // Branch node (top-left corner)
+  O10: { ...getOuterSquarePosition(10), emphasized: true }, // Top-left corner (branch node)
   O11: { ...getOuterSquarePosition(11), emphasized: false },
   O12: { ...getOuterSquarePosition(12), emphasized: false },
   O13: { ...getOuterSquarePosition(13), emphasized: false },
   O14: { ...getOuterSquarePosition(14), emphasized: false },
-  O15: { ...getOuterSquarePosition(15), emphasized: true }, // Junction node (bottom-left corner)
+  O15: { ...getOuterSquarePosition(15), emphasized: true }, // Bottom-left corner (junction node)
   O16: { ...getOuterSquarePosition(16), emphasized: false },
   O17: { ...getOuterSquarePosition(17), emphasized: false },
   O18: { ...getOuterSquarePosition(18), emphasized: false },
   O19: { ...getOuterSquarePosition(19), emphasized: false },
-  O20: { ...getOuterSquarePosition(20), emphasized: true }, // End node (bottom-right corner)
+  O20: { ...getOuterSquarePosition(20), emphasized: true }, // Bottom-right corner (end node)
   
   // Center
   C: { x: CENTER_X, y: CENTER_Y, emphasized: true },
