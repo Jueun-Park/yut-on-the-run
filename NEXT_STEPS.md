@@ -219,6 +219,8 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - [x] `SET_SELECTED_NODE` / `SET_SELECTED_TOKEN`
   - [x] `ADD_HAND_TOKEN` / `REMOVE_HAND_TOKEN`
   - [x] `SET_THROWS_REMAINING` / `DECREMENT_THROWS_REMAINING`
+  - [x] `THROW_YUT` (RNG result consumption, bonus throws)
+  - [x] `EXECUTE_MOVE` (move execution, auto-merge, auto turn advance, game over)
 - [x] Update components to use reducer state
   - [x] Header displays turn and seed
   - [x] Action tray reads phase, throwsRemaining, hand from state
@@ -249,22 +251,22 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - Phase-driven UI scaffolding (THROW, PLAY, REWARD, GAME_OVER)
   - Selection state management for board interactions
   - Action callbacks for node clicks
-- [ ] Implement HOME area
+- [x] Implement HOME area
   - Outside board UI (may not be rendered as board node)
   - Display count of unspawned pieces
-- [ ] Implement FINISHED area
+- [x] Implement FINISHED area
   - Inside board at **bottom internal area**
   - Horizontal row of **4 slots**
   - Slots fill to represent count only (no piece identification)
-- [ ] Display pieces/stacks on nodes
+- [x] Display pieces/stacks on nodes
   - Single piece: draw circular pawn smaller than node
   - Stacked (2+): show numeric badge 2/3/4 on pawn
   - Identical appearance for all pieces (no per-piece ID or color)
   - Highlight selectable stacks
 
 #### 3.6 Play Phase UI (`src/components/PlayPhase.tsx`)
-- [ ] Display hand tokens as selectable buttons/chips
-- [ ] Implement immediate move execution flow (no confirm button)
+- [x] Display hand tokens as selectable buttons/chips
+- [x] Implement immediate move execution flow (no confirm button)
   1. Player clicks token from hand
   2. System prompts: select stack or HOME
   3. Highlight enabled target nodes (Constraint UI)
@@ -272,7 +274,7 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   5. Player selects destination node
   6. **Immediate move execution** (no confirm button)
   7. Remove consumed token from hand
-- [ ] Implement target selection UI
+- [x] Implement target selection UI
   - Clickable stacks on board (only valid targets)
   - HOME button for spawning (when applicable)
   - Visual feedback for valid targets
