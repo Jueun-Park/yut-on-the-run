@@ -3,28 +3,9 @@ import { Board } from "./Board"
 import { useGameState } from "@/hooks/useGameState"
 import { Button } from "@/components/ui/button"
 import { useRollingState } from "@/ui/useRollingState"
-import { throwYut, grantsBonus } from "@/engine/rng"
 
 export function GameLayout() {
-  const { gameState, selectHandToken, startMovePhase, dispatch } = useGameState();
-
-  // Handle throw commit - RNG consumed exactly once here
-  const handleThrowCommit = () => {
-    // Throw yut with current stick inventory
-    const result = throwYut(gameState.stickInventory);
-
-    // Add result to hand
-    dispatch({ type: 'ADD_HAND_TOKEN', token: result });
-
-    // Decrement throws remaining
-    dispatch({ type: 'DECREMENT_THROWS_REMAINING' });
-
-    // If result is YUT or MO, grant bonus throw
-    // Bonus throw: restore one throw after consuming the current one
-    if (grantsBonus(result.result)) {
-      dispatch({ type: 'INCREMENT_THROWS_REMAINING' });
-    }
-  };
+  const { gameState, selectHandToken, startMovePhase, performThrow, selectMoveTarget } = useGameState();
 
   // Use rolling state machine for throw button
   const {
@@ -34,7 +15,7 @@ export function GameLayout() {
     handlePointerLeave,
     handlePointerCancel,
   } = useRollingState({
-    onCommit: handleThrowCommit,
+    onCommit: performThrow,
   });
 
   return (
@@ -108,8 +89,8 @@ export function GameLayout() {
                 {gameState.hand.map((token, index) => (
                   <Button
                     key={index}
-                    variant="outline"
-                    onClick={() => selectHandToken()}
+                    variant={gameState.selectedTokenIndex === index ? "default" : "outline"}
+                    onClick={() => selectHandToken(index)}
                   >
                     {token.result} ({token.steps})
                   </Button>
@@ -120,6 +101,22 @@ export function GameLayout() {
                   </div>
                 )}
               </div>
+              
+              {/* HOME button for spawning pieces */}
+              {gameState.selectedTokenIndex !== undefined && 
+               gameState.pieces.some(p => p.state === 'HOME') && (
+                <div className="space-y-2">
+                  <div className="text-sm text-muted-foreground">
+                    Or spawn from HOME:
+                  </div>
+                  <Button
+                    variant="secondary"
+                    onClick={() => selectMoveTarget({ type: 'HOME' })}
+                  >
+                    Spawn from HOME ({gameState.pieces.filter(p => p.state === 'HOME').length} pieces)
+                  </Button>
+                </div>
+              )}
             </div>
           )}
 
