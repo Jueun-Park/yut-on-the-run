@@ -31,36 +31,40 @@ const MARGIN = 100; // Margin from edges
  * O20 is also at bottom-right corner (ending position, completing the loop)
  * Counter-clockwise flow: O1→O5 (right edge, up), O6→O10 (top edge, left), 
  *                         O11→O15 (left edge, down), O16→O20 (bottom edge, right)
- * 20 nodes total: 5 nodes per side
+ * 20 nodes total: 5 nodes per side (1 starting corner + 4 middle nodes per edge)
+ * Corners at O5, O10, O15, O20
  */
 function getOuterSquarePosition(nodeNumber: number): { x: number; y: number } {
-  // Each side has 5 nodes (including corners)
-  const nodesPerSide = 5;
-  const spacing = BOARD_SIZE / (nodesPerSide - 1);
+  // 20 nodes total, 4 sides with 5 nodes each
+  // Each visual side has 4 non-corner nodes + 1 corner
+  const nodesPerEdge = 4; // Non-corner nodes per edge
+  const spacing = BOARD_SIZE / (nodesPerEdge + 1); // +1 to account for spacing to corners
   
   let x: number, y: number;
   
   if (nodeNumber >= 1 && nodeNumber <= 5) {
     // Right edge: O1-O5 (bottom to top)
-    // O1 at bottom-right corner, going up
-    const pos = nodeNumber - 1;
+    // O1 at bottom-right corner going up to O5 at top-right corner
+    const pos = nodeNumber - 1; // 0 to 4
     x = MARGIN + BOARD_SIZE;
     y = MARGIN + BOARD_SIZE - (pos * spacing);
   } else if (nodeNumber >= 6 && nodeNumber <= 10) {
     // Top edge: O6-O10 (right to left)
-    const pos = nodeNumber - 6;
-    x = MARGIN + BOARD_SIZE - (pos * spacing);
+    // Starting after O5 (top-right) to O10 (top-left corner)
+    const pos = nodeNumber - 6; // 0 to 4
+    x = MARGIN + BOARD_SIZE - ((pos + 1) * spacing);
     y = MARGIN;
   } else if (nodeNumber >= 11 && nodeNumber <= 15) {
     // Left edge: O11-O15 (top to bottom)
-    const pos = nodeNumber - 11;
+    // Starting after O10 (top-left) to O15 (bottom-left corner)
+    const pos = nodeNumber - 11; // 0 to 4
     x = MARGIN;
-    y = MARGIN + (pos * spacing);
+    y = MARGIN + ((pos + 1) * spacing);
   } else if (nodeNumber >= 16 && nodeNumber <= 20) {
     // Bottom edge: O16-O20 (left to right)
-    // O20 ends at bottom-right corner
-    const pos = nodeNumber - 16;
-    x = MARGIN + (pos * spacing);
+    // Starting after O15 (bottom-left) to O20 (bottom-right corner)
+    const pos = nodeNumber - 16; // 0 to 4
+    x = MARGIN + ((pos + 1) * spacing);
     y = MARGIN + BOARD_SIZE;
   } else {
     x = CENTER_X;
