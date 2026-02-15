@@ -2,72 +2,70 @@
  * Game State Hook
  * 
  * Provides game state management and phase control for the UI.
- * This is a minimal implementation to support the board UI scaffolding.
+ * Uses React useReducer + Context for centralized state management.
  */
 
 /* eslint-disable react-refresh/only-export-components */
 
-import { createContext, useContext, useState, type ReactNode } from 'react';
-import type { GameState, GamePhase } from '@/engine/state';
+import { createContext, useContext, useReducer, type ReactNode, type Dispatch } from 'react';
+import type { GameState } from '@/engine/state';
 import { initializeGameState } from '@/engine/state';
+import { gameReducer, type GameAction } from '@/engine/state/reducer';
 import type { NodeId } from '@/engine/board';
 
 interface GameStateContextType {
   gameState: GameState;
-  // Selection state for board interaction
+  dispatch: Dispatch<GameAction>;
+  // Selection state for board interaction (derived from gameState)
+  // Note: selectableNodes and destinationNodes are placeholders until full gameplay logic is implemented
   selectedNode: NodeId | null;
-  selectableNodes: NodeId[];
-  destinationNodes: NodeId[];
-  // Actions
+  selectableNodes: NodeId[]; // TODO: compute from game state based on valid moves
+  destinationNodes: NodeId[]; // TODO: compute from game state based on selected token
+  // Actions (convenience methods that dispatch actions)
   selectNode: (nodeId: NodeId) => void;
   resetSelection: () => void;
   // Phase transitions (stubs for now)
   startMovePhase: () => void;
-  selectHandToken: () => void;
+  selectHandToken: () => void; // TODO: implement with full gameplay logic
 }
 
 const GameStateContext = createContext<GameStateContextType | undefined>(undefined);
 
 export function GameStateProvider({ children }: { children: ReactNode }) {
-  // Initialize game state
-  const [gameState, setGameState] = useState<GameState>(() => initializeGameState());
+  // Initialize game state with reducer
+  const [gameState, dispatch] = useReducer(gameReducer, undefined, () => initializeGameState());
   
-  // Board interaction state
-  const [selectedNode, setSelectedNode] = useState<NodeId | null>(null);
-  const [selectableNodes, setSelectableNodes] = useState<NodeId[]>([]);
-  const [destinationNodes, setDestinationNodes] = useState<NodeId[]>([]);
+  // Derived selection state (not in reducer to keep UI concerns separate)
+  // These would be computed from gameState in a full implementation
+  const selectedNode = gameState.selectedNodeId ?? null;
+  const selectableNodes: NodeId[] = []; // TODO: compute from game state
+  const destinationNodes: NodeId[] = []; // TODO: compute from game state
 
   const selectNode = (nodeId: NodeId) => {
-    // Minimal implementation - just track selection
-    setSelectedNode(nodeId);
+    dispatch({ type: 'SET_SELECTED_NODE', nodeId });
   };
 
   const resetSelection = () => {
-    setSelectedNode(null);
-    setSelectableNodes([]);
-    setDestinationNodes([]);
+    dispatch({ type: 'SET_SELECTED_NODE', nodeId: undefined });
+    dispatch({ type: 'SET_SELECTED_TOKEN', tokenIndex: undefined });
   };
 
   const startMovePhase = () => {
-    // Stub: transition to PLAY phase
-    setGameState(prev => ({
-      ...prev,
-      phase: 'PLAY' as GamePhase,
-    }));
+    dispatch({ type: 'SET_PHASE', phase: 'PLAY' });
   };
 
   const selectHandToken = () => {
-    // Stub: mark a token as selected and show valid destinations
     // TODO: Accept token index parameter when implementing full gameplay
     // TODO: Calculate actual valid destinations based on game state
-    // For now, show a few example nodes as selectable for testing board highlights
-    setSelectableNodes(['O1', 'O5', 'O10', 'C']);
+    // This is a placeholder stub for future implementation
+    console.warn('selectHandToken is not yet implemented');
   };
 
   return (
     <GameStateContext.Provider
       value={{
         gameState,
+        dispatch,
         selectedNode,
         selectableNodes,
         destinationNodes,
@@ -88,5 +86,13 @@ export function useGameState() {
     throw new Error('useGameState must be used within GameStateProvider');
   }
   return context;
+}
+
+export function useGameDispatch() {
+  const context = useContext(GameStateContext);
+  if (!context) {
+    throw new Error('useGameDispatch must be used within GameStateProvider');
+  }
+  return context.dispatch;
 }
 

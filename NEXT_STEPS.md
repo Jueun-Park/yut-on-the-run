@@ -113,11 +113,11 @@ This document outlines the implementation plan for completing the MVP of yut-on-
     - backCount=0 → MO (5 steps)
 - [x] Add throw bonus logic (YUT/MO → +1 throw)
 - [ ] Add seed-based RNG for reproducibility
-  - [ ] Accept seed input (string, max 10 characters)
-  - [ ] Normalize seed with `trim()` function
-  - [ ] Generate random seed if trimmed seed is empty
-  - [ ] Store and display seed for sharing
-  - [ ] Ensure same seed + same choices = same game outcome
+  - [x] Accept seed input (string, max 10 characters)
+  - [x] Normalize seed with `trim()` function
+  - [x] Generate random seed if trimmed seed is empty
+  - [x] Store and display seed for sharing
+  - [ ] Ensure same seed + same choices = same game outcome (deterministic RNG integration pending)
 
 #### 2.5 Reward System (`src/engine/rewards/`)
 - [x] Calculate reward candidates based on stack size
@@ -153,11 +153,11 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - [ ] Seed input field (max 10 characters)
   - [ ] Input validation and character limit
   - [ ] "Play New Game with Seed" button
-- [ ] Implement seed handling
-  - [ ] Normalize seed with `trim()` on submission
-  - [ ] Generate random seed if trimmed seed is empty
-  - [ ] Display generated seed to user
-  - [ ] Store seed in game state for sharing
+- [x] Implement seed handling
+  - [x] Normalize seed with `trim()` on submission
+  - [x] Generate random seed if trimmed seed is empty
+  - [x] Display generated seed to user
+  - [x] Store seed in game state for sharing
 - [x] Style with Tailwind/shadcn/ui
 
 #### 3.2 Throw Phase UI (`src/components/ThrowPhase.tsx`)
@@ -198,6 +198,35 @@ This document outlines the implementation plan for completing the MVP of yut-on-
 #### 3.3 Board Visualization (`src/components/Board.tsx`)
 - [x] Create SVG board with traditional Yut board layout
   - Fixed coordinate layout
+
+#### 3.4 Game State Management (`src/hooks/useGameState.tsx`, `src/engine/state/`)
+- [x] Implement centralized state management with useReducer + Context
+  - [x] Define `GameAction` union type with minimal actions
+  - [x] Implement `gameReducer` for state transitions
+  - [x] Create `GameStateProvider` component
+  - [x] Provide `useGameState()` and `useGameDispatch()` hooks
+- [x] Add seed normalization utilities
+  - [x] `normalizeSeed()` function with trim and random generation
+  - [x] `generateRandomSeed()` function (max 10 characters)
+  - [x] Unit tests for seed utilities
+- [x] Update GameState type
+  - [x] Add `seed: string` field
+  - [x] Add UI selection fields (`selectedNodeId`, `selectedTokenIndex`)
+- [x] Implement minimal actions
+  - [x] `NEW_GAME` (accept and normalize seed)
+  - [x] `SET_PHASE`
+  - [x] `INCREMENT_TURN` / `END_TURN`
+  - [x] `SET_SELECTED_NODE` / `SET_SELECTED_TOKEN`
+  - [x] `ADD_HAND_TOKEN` / `REMOVE_HAND_TOKEN`
+  - [x] `SET_THROWS_REMAINING` / `DECREMENT_THROWS_REMAINING`
+- [x] Update components to use reducer state
+  - [x] Header displays turn and seed
+  - [x] Action tray reads phase, throwsRemaining, hand from state
+  - [x] Board dispatches SET_SELECTED_NODE on click
+- [x] Write comprehensive unit tests for reducer
+- [x] Maintain backward compatibility with existing tests
+
+#### 3.5 Play Phase UI (`src/components/PlayPhase.tsx`)
   - O1 positioned at **bottom-right**
   - Outer path numbering **counter-clockwise** from O1 to O20
   - Emphasized (large) nodes: **O5, O10, O15, O20, C**
@@ -233,7 +262,7 @@ This document outlines the implementation plan for completing the MVP of yut-on-
   - Identical appearance for all pieces (no per-piece ID or color)
   - Highlight selectable stacks
 
-#### 3.4 Play Phase UI (`src/components/PlayPhase.tsx`)
+#### 3.6 Play Phase UI (`src/components/PlayPhase.tsx`)
 - [ ] Display hand tokens as selectable buttons/chips
 - [ ] Implement immediate move execution flow (no confirm button)
   1. Player clicks token from hand
