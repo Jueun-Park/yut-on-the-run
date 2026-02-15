@@ -14,6 +14,7 @@
 import type { NodeId, SpecialNodeType } from '../board';
 import type { Stick } from '../content/sticks';
 import { BASIC_STICK } from '../content/sticks';
+import { normalizeSeed } from './seed';
 
 export const GamePhase = {
   THROW: 'THROW',
@@ -60,6 +61,7 @@ export interface Artifact {
 export interface GameState {
   phase: GamePhase;
   turn: number;
+  seed: string; // Game seed for deterministic RNG
   throwsRemaining: number;
   hand: HandToken[];
   pieces: Piece[];
@@ -69,6 +71,9 @@ export interface GameState {
   stickInventory: [Stick, Stick, Stick, Stick];
   // Special nodes mapping
   specialNodes: Record<NodeId, SpecialNodeType>;
+  // UI selection state
+  selectedNodeId?: NodeId;
+  selectedTokenIndex?: number;
   // For reward phase
   pendingReward: {
     stackSize: number;
@@ -82,14 +87,31 @@ export interface GameState {
 
 /**
  * Initialize a new game state
- * @param specialNodes Optional pre-initialized special nodes mapping
+ * @param seedOrSpecialNodes Optional seed string (will be normalized) or pre-initialized special nodes mapping (for backward compatibility)
+ * @param specialNodes Optional pre-initialized special nodes mapping (only used if first arg is a string)
  */
 export function initializeGameState(
+  seedOrSpecialNodes?: string | Record<NodeId, SpecialNodeType>,
   specialNodes?: Record<NodeId, SpecialNodeType>
 ): GameState {
+  // Handle backward compatibility: if first arg is an object, it's special nodes
+  let seed = '';
+  let nodes: Record<NodeId, SpecialNodeType> | undefined;
+  
+  if (typeof seedOrSpecialNodes === 'string' || seedOrSpecialNodes === undefined) {
+    seed = seedOrSpecialNodes || '';
+    nodes = specialNodes;
+  } else {
+    // First arg is special nodes (old signature)
+    nodes = seedOrSpecialNodes;
+  }
+  
+  const normalizedSeed = normalizeSeed(seed);
+  
   return {
     phase: GamePhase.THROW,
     turn: 1,
+    seed: normalizedSeed,
     throwsRemaining: 1,
     hand: [],
     pieces: [
@@ -101,7 +123,7 @@ export function initializeGameState(
     stacks: [],
     artifacts: [],
     stickInventory: [BASIC_STICK, BASIC_STICK, BASIC_STICK, BASIC_STICK],
-    specialNodes: specialNodes ?? {},
+    specialNodes: nodes ?? {},
     pendingReward: null,
     pendingStickOffer: null,
   };
@@ -431,3 +453,6 @@ export function updateSpecialNodes(
     specialNodes: newSpecialNodes,
   };
 }
+
+// Re-export seed utilities
+export { normalizeSeed, generateRandomSeed } from './seed';

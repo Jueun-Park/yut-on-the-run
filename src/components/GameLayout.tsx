@@ -13,9 +13,14 @@ export function GameLayout() {
         <div className="mx-auto w-full max-w-md flex h-14 items-center justify-between px-4">
           <div className="flex items-center gap-3">
             <h1 className="text-lg font-semibold">yut-on-the-run</h1>
-            <span className="text-sm text-muted-foreground">
-              Turn {gameState.turn}
-            </span>
+            <div className="flex flex-col items-start">
+              <span className="text-sm text-muted-foreground">
+                Turn {gameState.turn}
+              </span>
+              <span className="text-xs text-muted-foreground">
+                Seed: {gameState.seed}
+              </span>
+            </div>
           </div>
           <Settings />
         </div>
