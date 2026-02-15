@@ -10,6 +10,7 @@
 
 import { BOARD_GRAPH, type NodeId } from '@/engine/board';
 import { NODE_COORDINATES, VISUAL_CONSTANTS } from './BoardCoordinates';
+import type { Stack, Piece } from '@/engine/state';
 
 interface BoardProps {
   // Selection and interaction state
@@ -17,6 +18,9 @@ interface BoardProps {
   selectableNodes: NodeId[];
   destinationNodes: NodeId[];
   onNodeClick?: (nodeId: NodeId) => void;
+  // Game state for rendering pieces
+  stacks?: Stack[];
+  pieces?: Piece[];
 }
 
 /**
@@ -42,6 +46,8 @@ export function Board({
   selectableNodes,
   destinationNodes,
   onNodeClick,
+  stacks = [],
+  pieces = [],
 }: BoardProps) {
   const edges = getBoardEdges();
   const { VIEWBOX_SIZE, NODE_RADIUS_NORMAL, NODE_RADIUS_EMPHASIZED, HIT_RADIUS, LINE_WIDTH } = VISUAL_CONSTANTS;
@@ -55,6 +61,15 @@ export function Board({
   const isSelectable = (nodeId: NodeId) => selectableNodes.includes(nodeId);
   const isSelected = (nodeId: NodeId) => nodeId === selectedNode;
   const isDestination = (nodeId: NodeId) => destinationNodes.includes(nodeId);
+  
+  // Get stack at a given position
+  const getStackAtNode = (nodeId: NodeId) => {
+    return stacks.find(s => s.position === nodeId);
+  };
+  
+  // Count finished and home pieces
+  const finishedCount = pieces.filter(p => p.state === 'FINISHED').length;
+  const homeCount = pieces.filter(p => p.state === 'HOME').length;
 
   return (
     <div className="w-full h-full flex items-center justify-center">
@@ -143,6 +158,124 @@ export function Board({
               </g>
             );
           })}
+        </g>
+
+        {/* Pieces/Stacks */}
+        <g className="pieces">
+          {stacks.map((stack) => {
+            const coord = NODE_COORDINATES[stack.position];
+            if (!coord) return null;
+
+            const pieceCount = stack.pieceIds.length;
+            const pieceRadius = 8; // Smaller than node radius
+            
+            // Determine piece color - highlight if selectable
+            const stackSelectable = isSelectable(stack.position);
+            const pieceClass = stackSelectable ? 'text-amber-400' : 'text-primary';
+
+            return (
+              <g key={stack.id} className={pieceClass}>
+                {/* Piece circle */}
+                <circle
+                  cx={coord.x}
+                  cy={coord.y}
+                  r={pieceRadius}
+                  fill="currentColor"
+                  className="pointer-events-none"
+                />
+                
+                {/* Stack count badge (if 2+ pieces) */}
+                {pieceCount > 1 && (
+                  <>
+                    {/* Badge background */}
+                    <circle
+                      cx={coord.x + pieceRadius - 2}
+                      cy={coord.y - pieceRadius + 2}
+                      r={6}
+                      fill="white"
+                      className="pointer-events-none"
+                    />
+                    {/* Badge number */}
+                    <text
+                      x={coord.x + pieceRadius - 2}
+                      y={coord.y - pieceRadius + 2}
+                      fontSize="10"
+                      fontWeight="bold"
+                      textAnchor="middle"
+                      dominantBaseline="central"
+                      fill="black"
+                      className="pointer-events-none"
+                    >
+                      {pieceCount}
+                    </text>
+                  </>
+                )}
+              </g>
+            );
+          })}
+        </g>
+        
+        {/* FINISHED area - 4 slots at bottom of board */}
+        <g className="finished-area">
+          {[0, 1, 2, 3].map((slotIndex) => {
+            const slotX = VIEWBOX_SIZE / 2 - 60 + slotIndex * 40;
+            const slotY = VIEWBOX_SIZE - 50;
+            const filled = slotIndex < finishedCount;
+            
+            return (
+              <g key={`finished-${slotIndex}`}>
+                {/* Slot outline */}
+                <circle
+                  cx={slotX}
+                  cy={slotY}
+                  r={12}
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  className="text-muted-foreground"
+                />
+                
+                {/* Filled piece */}
+                {filled && (
+                  <circle
+                    cx={slotX}
+                    cy={slotY}
+                    r={8}
+                    fill="currentColor"
+                    className="text-green-500"
+                  />
+                )}
+              </g>
+            );
+          })}
+          
+          {/* FINISHED label */}
+          <text
+            x={VIEWBOX_SIZE / 2}
+            y={VIEWBOX_SIZE - 20}
+            fontSize="14"
+            fontWeight="bold"
+            textAnchor="middle"
+            fill="currentColor"
+            className="text-muted-foreground"
+          >
+            FINISHED
+          </text>
+        </g>
+        
+        {/* HOME area - top right corner */}
+        <g className="home-area">
+          <text
+            x={VIEWBOX_SIZE - 80}
+            y={30}
+            fontSize="14"
+            fontWeight="bold"
+            textAnchor="middle"
+            fill="currentColor"
+            className="text-muted-foreground"
+          >
+            HOME: {homeCount}
+          </text>
         </g>
       </svg>
     </div>
