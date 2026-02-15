@@ -11,15 +11,11 @@ export function GameLayout() {
       {/* Header */}
       <header className="sticky top-0 z-10 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
         <div className="mx-auto w-full max-w-md flex h-14 items-center justify-between px-4">
-          <div className="flex items-center gap-3">
-            <h1 className="text-lg font-semibold">yut-on-the-run</h1>
-            <div className="flex flex-col items-start">
-              <span className="text-sm text-muted-foreground">
-                Turn {gameState.turn}
-              </span>
-              <span className="text-xs text-muted-foreground">
-                Seed: {gameState.seed}
-              </span>
+          <div className="flex items-center gap-2 min-w-0">
+            <h1 className="text-lg font-semibold whitespace-nowrap">yut-on-the-run</h1>
+            <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-0">
+              <span className="whitespace-nowrap">Turn {gameState.turn}</span>
+              <span className="text-xs truncate">Seed: {gameState.seed}</span>
             </div>
           </div>
           <Settings />
