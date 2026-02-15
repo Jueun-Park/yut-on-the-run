@@ -5,8 +5,10 @@
  */
 
 import type { GameState, GamePhase, HandToken } from './index';
-import { initializeGameState } from './index';
+import { initializeGameState, isGameOver } from './index';
 import type { NodeId } from '../board';
+import type { BranchOption } from '../board';
+import { executeMove, type MoveTarget } from '../rules';
 
 /**
  * Game Action Types
@@ -22,7 +24,9 @@ export type GameAction =
   | { type: 'REMOVE_HAND_TOKEN'; index: number }
   | { type: 'SET_THROWS_REMAINING'; count: number }
   | { type: 'DECREMENT_THROWS_REMAINING' }
-  | { type: 'INCREMENT_THROWS_REMAINING' };
+  | { type: 'INCREMENT_THROWS_REMAINING' }
+  | { type: 'THROW_YUT'; token: HandToken }
+  | { type: 'EXECUTE_MOVE'; tokenIndex: number; target: MoveTarget; branchChoice?: BranchOption };
 
 /**
  * Game Reducer
@@ -98,6 +102,66 @@ export function gameReducer(state: GameState, action: GameAction): GameState {
         ...state,
         throwsRemaining: state.throwsRemaining + 1,
       };
+
+    case 'THROW_YUT': {
+      // Add token to hand
+      const newHand = [...state.hand, action.token];
+      
+      // Decrement throws remaining
+      const newThrowsRemaining = Math.max(0, state.throwsRemaining - 1);
+      
+      // Check if result grants bonus throw (YUT or MO)
+      const grantsBonus = action.token.result === 'YUT' || action.token.result === 'MO';
+      
+      return {
+        ...state,
+        hand: newHand,
+        throwsRemaining: grantsBonus ? newThrowsRemaining + 1 : newThrowsRemaining,
+      };
+    }
+
+    case 'EXECUTE_MOVE': {
+      const { tokenIndex, target, branchChoice } = action;
+      
+      // Get the token to use
+      if (tokenIndex < 0 || tokenIndex >= state.hand.length) {
+        throw new Error('Invalid token index');
+      }
+      
+      const token = state.hand[tokenIndex];
+      
+      // Execute the move using engine function
+      let newState = executeMove(state, target, token.steps, branchChoice);
+      
+      // Remove used token from hand
+      newState = {
+        ...newState,
+        hand: newState.hand.filter((_, i) => i !== tokenIndex),
+        selectedTokenIndex: undefined,
+        selectedNodeId: undefined,
+      };
+      
+      // Check if all pieces are finished -> GAME_OVER
+      if (isGameOver(newState)) {
+        return {
+          ...newState,
+          phase: 'GAME_OVER',
+        };
+      }
+      
+      // If hand is empty, auto END_TURN
+      if (newState.hand.length === 0) {
+        return {
+          ...newState,
+          phase: 'THROW',
+          turn: newState.turn + 1,
+          throwsRemaining: 1,
+        };
+      }
+      
+      // Otherwise stay in PLAY phase
+      return newState;
+    }
 
     default:
       return state;
