@@ -20,7 +20,7 @@ export function GameLayout() {
     dispatch({ type: 'DECREMENT_THROWS_REMAINING' });
 
     // If result is YUT or MO, grant bonus throw
-    // Net effect: decrement by 1, then increment by 1 = no change
+    // Bonus throw: restore one throw after consuming the current one
     if (grantsBonus(result.result)) {
       dispatch({ type: 'INCREMENT_THROWS_REMAINING' });
     }

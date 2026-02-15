@@ -41,9 +41,9 @@ export function useRollingState({ onCommit }: UseRollingStateOptions): UseRollin
   const rollingStartTimeRef = useRef<number | null>(null);
   
   // Timer references for cleanup
-  const minTimerRef = useRef<number | null>(null);
-  const maxTimerRef = useRef<number | null>(null);
-  const tickIntervalRef = useRef<number | null>(null);
+  const minTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const maxTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const tickIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   /**
    * Commit the throw (call RNG and update state)
@@ -91,17 +91,17 @@ export function useRollingState({ onCommit }: UseRollingStateOptions): UseRollin
 
     // Start tick vibration immediately and then every 500ms
     vibrateTick();
-    tickIntervalRef.current = window.setInterval(() => {
+    tickIntervalRef.current = setInterval(() => {
       vibrateTick();
     }, TICK_INTERVAL);
 
     // Set minimum timer (0.5s)
-    minTimerRef.current = window.setTimeout(() => {
+    minTimerRef.current = setTimeout(() => {
       minTimerRef.current = null;
     }, MIN_ROLLING_DURATION);
 
     // Set maximum timer (3.0s) - auto-commit
-    maxTimerRef.current = window.setTimeout(() => {
+    maxTimerRef.current = setTimeout(() => {
       commit();
     }, MAX_ROLLING_DURATION);
   }, [commit]);
@@ -125,7 +125,7 @@ export function useRollingState({ onCommit }: UseRollingStateOptions): UseRollin
       if (minTimerRef.current !== null) {
         clearTimeout(minTimerRef.current);
       }
-      minTimerRef.current = window.setTimeout(() => {
+      minTimerRef.current = setTimeout(() => {
         commit();
       }, remainingTime);
     } else {
