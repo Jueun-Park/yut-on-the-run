@@ -111,7 +111,8 @@ export const NODE_COORDINATES: Record<NodeId, NodeCoordinate> = {
   B3: { ...getDiagonalPosition(getOuterRingAngle(20), 'inner'), emphasized: false },
   B4: { ...getDiagonalPosition(getOuterRingAngle(20), 'middle'), emphasized: false },
   
-  // O0 (HOME) is not rendered on the board
+  // O0 (HOME) is not rendered on the board - positioned off-screen
+  // This is intentional: HOME is a logical position, not a visual board node
   O0: { x: -100, y: -100, emphasized: false },
 };
 

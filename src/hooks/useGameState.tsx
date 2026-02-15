@@ -58,8 +58,9 @@ export function GameStateProvider({ children }: { children: ReactNode }) {
 
   const selectHandToken = () => {
     // Stub: mark a token as selected and show valid destinations
-    // For now, just show all nodes as selectable for testing
     // TODO: Accept token index parameter when implementing full gameplay
+    // TODO: Calculate actual valid destinations based on game state
+    // For now, show a few example nodes as selectable for testing board highlights
     setSelectableNodes(['O1', 'O5', 'O10', 'C']);
   };
 
