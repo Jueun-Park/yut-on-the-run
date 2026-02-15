@@ -2,9 +2,39 @@ import { Settings } from "./Settings"
 import { Board } from "./Board"
 import { useGameState } from "@/hooks/useGameState"
 import { Button } from "@/components/ui/button"
+import { useRollingState } from "@/ui/useRollingState"
+import { throwYut, grantsBonus } from "@/engine/rng"
 
 export function GameLayout() {
-  const { gameState, selectHandToken, startMovePhase } = useGameState();
+  const { gameState, selectHandToken, startMovePhase, dispatch } = useGameState();
+
+  // Handle throw commit - RNG consumed exactly once here
+  const handleThrowCommit = () => {
+    // Throw yut with current stick inventory
+    const result = throwYut(gameState.stickInventory);
+
+    // Add result to hand
+    dispatch({ type: 'ADD_HAND_TOKEN', token: result });
+
+    // Decrement throws remaining
+    dispatch({ type: 'DECREMENT_THROWS_REMAINING' });
+
+    // If result is YUT or MO, grant bonus throw
+    if (grantsBonus(result.result)) {
+      dispatch({ type: 'SET_THROWS_REMAINING', count: gameState.throwsRemaining }); // +1 from decrement = net 0
+    }
+  };
+
+  // Use rolling state machine for throw button
+  const {
+    isRolling,
+    handlePointerDown,
+    handlePointerUp,
+    handlePointerLeave,
+    handlePointerCancel,
+  } = useRollingState({
+    onCommit: handleThrowCommit,
+  });
 
   return (
     <div className="min-h-screen flex flex-col bg-background text-foreground">
@@ -48,8 +78,12 @@ export function GameLayout() {
                 <Button
                   className="flex-1"
                   disabled={gameState.throwsRemaining <= 0}
+                  onPointerDown={handlePointerDown}
+                  onPointerUp={handlePointerUp}
+                  onPointerLeave={handlePointerLeave}
+                  onPointerCancel={handlePointerCancel}
                 >
-                  Throw
+                  {isRolling ? '🎲 Rolling...' : 'Throw'}
                 </Button>
                 <Button
                   className="flex-1"
